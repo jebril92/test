@@ -1,3 +1,10 @@
+<?php
+session_start();
+require_once 'config/db-config.php';
+require_once 'includes/session-functions.php';
+
+$user_role = get_user_role();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,10 +17,6 @@
   <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-  <?php
-  session_start();
-  require_once 'config/db-config.php';
-  ?>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand" href="#">
@@ -38,10 +41,30 @@
             <a class="nav-link" href="#faq">FAQ</a>
           </li>
           <li class="nav-item ms-lg-3">
-            <?php if (isset($_SESSION['user_id'])): ?>
-              <a class="btn btn-primary btn-login" href="dashboard.php">Mon compte</a>
-            <?php else: ?>
+            <?php if ($user_role === 'guest'): ?>
               <a class="btn btn-primary btn-login" href="login.php">Se connecter</a>
+            <?php elseif ($user_role === 'user'): ?>
+              <div class="dropdown">
+                <a class="btn btn-primary btn-login dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Mon compte
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
+                </ul>
+              </div>
+            <?php elseif ($user_role === 'admin'): ?>
+              <div class="dropdown">
+                <a class="btn btn-danger btn-login dropdown-toggle" href="#" role="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Administration
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                  <li><a class="dropdown-item" href="admin/dashboard.php">Tableau de bord admin</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
+                </ul>
+              </div>
             <?php endif; ?>
           </li>
         </ul>
@@ -73,8 +96,7 @@
               <button class="btn btn-primary" type="submit">Raccourcir</button>
             </div>
             
-            <!-- Options avancées pour les utilisateurs connectés -->
-            <?php if (isset($_SESSION['user_id'])): ?>
+            <?php if ($user_role !== 'guest'): ?>
             <div class="card mt-3 mb-3">
               <div class="card-header bg-light">
                 Options avancées
@@ -102,7 +124,6 @@
             <?php endif; ?>
           </form>
           
-          <!-- Modal pour le QR Code -->
           <div class="modal fade" id="qr-modal" tabindex="-1" aria-labelledby="qr-modal-label" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">

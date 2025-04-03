@@ -41,6 +41,7 @@ try {
             // Vérifier si l'utilisateur est le propriétaire ou si l'URL est publique
             if ($current_user_id == $url_info['user_id'] || $url_info['user_id'] == 1) {
                 displayOriginalUrl($url_info);
+                exit();
             } else {
                 header("Location: login.php?message=unauthorized");
                 exit();

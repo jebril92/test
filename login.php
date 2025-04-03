@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Activation des messages d'erreur pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -9,7 +8,6 @@ error_reporting(E_ALL);
 $login_error = "";
 $register_error = "";
 
-// Inclure les fichiers nécessaires
 if (file_exists('config/db-config.php')) {
     include_once 'config/db-config.php';
 } else {
@@ -20,6 +18,18 @@ if (file_exists('includes/mail-functions.php')) {
     include_once 'includes/mail-functions.php';
 } else {
     echo "Erreur: fichier mail-functions.php introuvable";
+}
+
+if (file_exists('includes/session-functions.php')) {
+    include_once 'includes/session-functions.php';
+} else {
+    echo "Erreur: fichier session-functions introuvable";
+}
+
+if (isset($_GET['logout'])) {
+    destroy_session();
+    header("Location: login.php");
+    exit();
 }
 
 // Traitement du formulaire d'inscription
@@ -96,17 +106,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $conn->prepare("SELECT id, username, email, password, is_verified FROM users WHERE email = ?");
+            $stmt = $conn->prepare("SELECT id, username, email, password, is_verified, is_admin FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            var_dump($user);
             
             if ($user && password_verify($password, $user['password'])) {
                 if ($user['is_verified'] == 1) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['email'] = $user['email'];
+                    create_secure_session($user['id'], $user['username'], $user['email'], (int)$user['is_admin']);
                     
-                    header("Location: dashboard.php");
+                    header("Location: index.php");
                     exit();
                 } else {
                     $_SESSION['pending_verification_email'] = $email;
