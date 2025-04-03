@@ -10,6 +10,10 @@
   <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
+  <?php
+  session_start();
+  require_once 'config/db-config.php';
+  ?>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand" href="#">
@@ -34,7 +38,11 @@
             <a class="nav-link" href="#faq">FAQ</a>
           </li>
           <li class="nav-item ms-lg-3">
-            <a class="btn btn-primary btn-login" href="login.php">Se connecter</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+              <a class="btn btn-primary btn-login" href="dashboard.php">Mon compte</a>
+            <?php else: ?>
+              <a class="btn btn-primary btn-login" href="login.php">Se connecter</a>
+            <?php endif; ?>
           </li>
         </ul>
       </div>
@@ -64,12 +72,74 @@
               <input type="url" class="form-control" id="long-url" placeholder="Collez votre lien long ici..." required>
               <button class="btn btn-primary" type="submit">Raccourcir</button>
             </div>
+            
+            <!-- Options avancées pour les utilisateurs connectés -->
+            <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="card mt-3 mb-3">
+              <div class="card-header bg-light">
+                Options avancées
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="custom-code" class="form-label">Code personnalisé (optionnel)</label>
+                    <input type="text" class="form-control" id="custom-code" placeholder="moncode" pattern="[a-zA-Z0-9]+" title="Uniquement des lettres et des chiffres">
+                    <div class="form-text">Laissez vide pour générer automatiquement</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="expiry" class="form-label">Durée de validité</label>
+                    <select class="form-select" id="expiry">
+                      <option value="">Pas d'expiration</option>
+                      <option value="24">24 heures</option>
+                      <option value="168">7 jours</option>
+                      <option value="720">30 jours</option>
+                      <option value="8760">1 an</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
           </form>
+          
+          <!-- Modal pour le QR Code -->
+          <div class="modal fade" id="qr-modal" tabindex="-1" aria-labelledby="qr-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="qr-modal-label">QR Code</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <img src="" alt="QR Code" class="qr-image img-fluid">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                  <button type="button" class="btn btn-primary" id="download-qr">Télécharger</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div class="link-preview" id="link-result">
             <div class="row align-items-center">
               <div class="col-md-8">
                 <p class="mb-1">Votre lien raccourci :</p>
-                <p class="shortened-url mb-0" id="short-url">https://example.fr/a7bC9d</p>
+                <p class="shortened-url mb-0" id="short-url"></p>
+                
+                <div id="link-info-container" class="mt-3 small text-muted">
+                  <p class="mb-1">Créé le: <span id="created-at"></span></p>
+                  <p class="mb-1" style="display: none;">Expire le: <span id="expiry-datetime"></span></p>
+                </div>
+                
+                <div class="mt-3">
+                  <p class="mb-1">Utilisez ces suffixes spéciaux :</p>
+                  <ul class="list-unstyled small text-muted">
+                    <li><code>+</code> - Pour voir l'URL originale</li>
+                    <li><code>*</code> - Pour voir les statistiques (utilisateurs inscrits uniquement)</li>
+                    <li><code>-</code> - Pour supprimer le lien (utilisateurs inscrits uniquement)</li>
+                  </ul>
+                </div>
               </div>
               <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <button class="btn btn-sm btn-outline-primary me-2" id="copy-btn">
@@ -410,5 +480,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/shorten.js"></script>
 </body>
 </html>
