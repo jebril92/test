@@ -5,16 +5,13 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-// require_once '../config/db-config.php';
 require_once '../includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est un administrateur
 if (!is_logged_in(true)) {
     header("Location: ../login.php?message=unauthorized");
     exit();
 }
 
-// Statistiques générales
 $total_users = 0;
 $active_users = 0;
 $total_links = 0;

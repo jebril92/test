@@ -53,33 +53,43 @@ try {
     // Récupérer les statistiques de clics par jour
     $stmt = $conn->prepare("
         SELECT 
-            DATE(date_clicked) as click_date, 
-            COUNT(*) as click_count
+            DATE(date_clicked) as click_date,
+            HOUR(date_clicked) as click_hour,
+            COUNT(*) as count
         FROM click_stats 
         WHERE url_id = ? 
-        GROUP BY DATE(date_clicked)
-        ORDER BY click_date
+        GROUP BY DATE(date_clicked), HOUR(date_clicked)
+        ORDER BY click_date, click_hour
     ");
     $stmt->execute([$url_id]);
-    $click_stats_by_day = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $click_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     
-    // Récupérer les statistiques par heure
-    $stmt = $conn->prepare("
-        SELECT 
-            HOUR(date_clicked) as click_hour, 
-            COUNT(*) as click_count
-        FROM click_stats 
-        WHERE url_id = ? 
-        GROUP BY HOUR(date_clicked)
-        ORDER BY click_hour
-    ");
-    $stmt->execute([$url_id]);
-    $click_stats_by_hour = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Initialiser tous les heures avec 0 clics
+    $daily_data = [];
     $hours_data = array_fill(0, 24, 0);
-    foreach ($click_stats_by_hour as $hour_data) {
-        $hours_data[(int)$hour_data['click_hour']] = (int)$hour_data['click_count'];
+
+    foreach ($click_stats as $stat) {
+        $date = $stat['click_date'];
+        $hour = (int)$stat['click_hour'];
+        $count = (int)$stat['count'];
+        
+        // Agréger par jour
+        if (!isset($daily_data[$date])) {
+            $daily_data[$date] = 0;
+        }
+        $daily_data[$date] += $count;
+        
+        // Agréger par heure
+        $hours_data[$hour] += $count;
+    }
+    
+    // Formater pour l'affichage du graphique par jour
+    $click_stats_by_day = [];
+    foreach ($daily_data as $date => $count) {
+        $click_stats_by_day[] = [
+            'click_date' => $date,
+            'click_count' => $count
+        ];
     }
     
     // Récupérer les statistiques par navigateur (simple version)
@@ -197,8 +207,11 @@ $short_url = $base_url . $url_info['short_code'];
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="css/styles.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
     
-    <!-- Ajouter Chart.js pour les graphiques -->
     
 </head>
 <body>

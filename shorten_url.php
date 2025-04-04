@@ -43,6 +43,60 @@ try {
     // Définir le fuseau horaire MySQL pour qu'il corresponde à celui de PHP
     $conn->exec("SET time_zone = '+02:00'");
     
+    // Gestion des limites d'utilisation
+    $ip_address = $_SERVER['REMOTE_ADDR'];
+    
+    // Si l'utilisateur n'est pas connecté, vérifier les limites par IP
+    if ($userId == 1) { // 1 est l'ID des utilisateurs anonymes
+        // Vérifier combien de liens cette IP a créés dans les dernières 24 heures
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) FROM shortened_urls 
+            WHERE user_id = 1 
+            AND ip_address = ? 
+            AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        ");
+        $stmt->execute([$ip_address]);
+        $link_count = $stmt->fetchColumn();
+        
+        // Limite : 10 liens par jour pour les utilisateurs non connectés
+        $max_links_per_day = 10;
+        
+        if ($link_count >= $max_links_per_day) {
+            echo json_encode([
+                'status' => 'error', 
+                'message' => 'Limite quotidienne atteinte. Veuillez vous connecter pour créer plus de liens ou réessayez demain.'
+            ]);
+            exit;
+        }
+        
+        // Ajouter l'IP à l'enregistrement pour les utilisateurs anonymes
+        $ip_track = $ip_address;
+    } else {
+        // Pour les utilisateurs connectés, vérifier leur limite globale
+        // Récupérer la limite depuis les paramètres
+        $stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'max_links_per_user'");
+        $stmt->execute();
+        $max_links_per_user = (int) $stmt->fetchColumn();
+        
+        // Si la limite n'est pas illimitée (0)
+        if ($max_links_per_user > 0) {
+            // Compter les liens de l'utilisateur
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM shortened_urls WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $user_links_count = $stmt->fetchColumn();
+            
+            if ($user_links_count >= $max_links_per_user) {
+                echo json_encode([
+                    'status' => 'error', 
+                    'message' => "Vous avez atteint votre limite de {$max_links_per_user} liens. Veuillez contacter l'administrateur pour obtenir plus de crédits."
+                ]);
+                exit;
+            }
+        }
+        
+        $ip_track = null; // Pour les utilisateurs connectés, pas besoin de suivre l'IP
+    }
+    
     // Générer ou utiliser le code court
     if (!empty($customCode)) {
         $shortCode = $customCode;
@@ -75,13 +129,14 @@ try {
     
     // Insérer l'URL dans la base de données
     $stmt = $conn->prepare("
-        INSERT INTO shortened_urls (original_url, short_code, user_id, created_at, expiry_datetime)
-        VALUES (:original_url, :short_code, :user_id, NOW(), :expiry_datetime)
+        INSERT INTO shortened_urls (original_url, short_code, user_id, ip_address, created_at, expiry_datetime)
+        VALUES (:original_url, :short_code, :user_id, :ip_address, NOW(), :expiry_datetime)
     ");
     
     $stmt->bindParam(':original_url', $originalUrl);
     $stmt->bindParam(':short_code', $shortCode);
     $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->bindParam(':ip_address', $ip_track);
     
     // Utiliser PDO::PARAM_NULL pour garantir que null est correctement inséré
     if ($expiryDatetime === null) {
@@ -155,3 +210,4 @@ function generateUniqueCode($conn, $length = 6) {
     // Si génération impossible après plusieurs tentatives, utiliser un timestamp
     return substr(base_convert(time(), 10, 36), 0, $length);
 }
+?>

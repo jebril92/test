@@ -30,48 +30,48 @@ function highlightNavLink() {
 window.addEventListener('scroll', highlightNavLink);
 
 // URL Shortener Form Functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const shortenForm = document.getElementById('shorten-form');
-  const linkResult = document.getElementById('link-result');
-  const copyBtn = document.getElementById('copy-btn');
+// document.addEventListener('DOMContentLoaded', function() {
+//   const shortenForm = document.getElementById('shorten-form');
+//   const linkResult = document.getElementById('link-result');
+//   const copyBtn = document.getElementById('copy-btn');
   
-  shortenForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const longUrl = document.getElementById('long-url').value;
+//   shortenForm.addEventListener('submit', function(e) {
+//     e.preventDefault();
+//     const longUrl = document.getElementById('long-url').value;
     
-    // In a real application, you would send the URL to your server
-    // For this static demo, we'll just show the result
+//     // In a real application, you would send the URL to your server
+//     // For this static demo, we'll just show the result
     
-    // Generate a random short code
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let shortCode = '';
-    for (let i = 0; i < 6; i++) {
-      shortCode += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+//     // Generate a random short code
+//     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//     let shortCode = '';
+//     for (let i = 0; i < 6; i++) {
+//       shortCode += chars.charAt(Math.floor(Math.random() * chars.length));
+//     }
     
-    // Display the shortened URL
-    document.getElementById('short-url').textContent = 'https://lnkshrk.fr/' + shortCode;
-    linkResult.style.display = 'block';
+//     // Display the shortened URL
+//     document.getElementById('short-url').textContent = 'https://lnkshrk.fr/' + shortCode;
+//     linkResult.style.display = 'block';
     
-    // Smooth scroll to result
-    linkResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  });
+//     // Smooth scroll to result
+//     linkResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+//   });
   
-  // Copy button functionality
-  copyBtn.addEventListener('click', function() {
-    const shortUrl = document.getElementById('short-url').textContent;
-    navigator.clipboard.writeText(shortUrl).then(function() {
-      // Change button text temporarily
-      const originalText = copyBtn.innerHTML;
-      copyBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copié!';
+//   // Copy button functionality
+//   copyBtn.addEventListener('click', function() {
+//     const shortUrl = document.getElementById('short-url').textContent;
+//     navigator.clipboard.writeText(shortUrl).then(function() {
+//       // Change button text temporarily
+//       const originalText = copyBtn.innerHTML;
+//       copyBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copié!';
       
-      setTimeout(function() {
-        copyBtn.innerHTML = originalText;
-      }, 2000);
-    });
-  });
+//       setTimeout(function() {
+//         copyBtn.innerHTML = originalText;
+//       }, 2000);
+//     });
+//   });
   
-});
+// });
 
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
