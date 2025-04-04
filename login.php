@@ -19,13 +19,23 @@ if (file_exists('includes/mail-functions.php')) {
 if (file_exists('includes/sessions-functions.php')) {
     include_once 'includes/sessions-functions.php';
 } else {
-    echo "Erreur: fichier sessions-functions introuvable";
+    echo "Erreur: fichier sessions-functions.php introuvable";
+}
+
+if (file_exists('includes/maintenance-check.php')) {
+    include_once 'includes/maintenance-check.php';
+} else {
+    echo "Erreur: fichier maintenance-check.php introuvable";
 }
 
 if (isset($_GET['logout'])) {
     destroy_session();
     header("Location: login.php");
     exit();
+}
+
+if (is_maintenance_mode() && !isset($_POST['action'])) {
+    $maintenance_message = true;
 }
 
 // Traitement du formulaire d'inscription
@@ -105,8 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             $stmt = $conn->prepare("SELECT id, username, email, password, is_verified, is_admin FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            var_dump($user);
             
             if ($user && password_verify($password, $user['password'])) {
                 if ($user['is_verified'] == 1) {
@@ -140,6 +148,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
 <body>
 
+<?php if (isset($maintenance_message)): ?>
+    <div class="maintenance-alert">
+        <i class="fas fa-tools"></i> Le site est actuellement en mode maintenance. Seuls les administrateurs peuvent s'y connecter.
+    </div>
+<?php endif; ?>
     <div class="container <?php echo (!empty($register_error) || isset($_GET['register'])) ? 'active' : ''; ?>" id="container">
         <div class="form-container sign-up">
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">

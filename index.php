@@ -2,6 +2,9 @@
 session_start();
 require_once 'config/db-config.php';
 require_once 'includes/sessions-functions.php';
+require_once 'includes/maintenance-check.php';
+
+check_maintenance_mode();
 
 $user_role = get_user_role();
 
@@ -408,7 +411,7 @@ $user_role = get_user_role();
               </h2>
               <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                  Avec notre plan gratuit, vos liens restent actifs pendant 1 an. Avec nos plans payants Pro et Entreprise, vos liens restent actifs indéfiniment, tant que votre abonnement est valide.
+                  Avec notre plan gratuit, vos liens restent actifs à vie. De plus, avec l'abonnement Entreprise, vous bénéficiez d'un support dédié pour répondre à toutes vos questions et besoins spécifiques.
                 </div>
               </div>
             </div>
@@ -420,7 +423,7 @@ $user_role = get_user_role();
               </h2>
               <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                  Oui, la personnalisation des liens est disponible sur nos forfaits Pro et Entreprise. Vous pouvez créer des URLs personnalisées qui reflètent votre marque ou le contenu de votre lien, ce qui les rend plus mémorables et professionnels.
+                  Oui, la personnalisation des liens est disponible. Vous pouvez créer des URLs personnalisées qui reflètent votre marque ou le contenu de votre lien, ce qui les rend plus mémorables et professionnels.
                 </div>
               </div>
             </div>
@@ -444,7 +447,7 @@ $user_role = get_user_role();
               </h2>
               <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                  Absolument. Nous analysons chaque URL soumise pour détecter les menaces potentielles. Tous nos liens sont également servis via HTTPS pour garantir une connexion sécurisée. De plus, nous proposons des options de protection par mot de passe pour les liens contenant des informations sensibles.
+                  Absolument. Nous analysons chaque URL soumise pour détecter les menaces potentielles. Tous nos liens sont également servis via HTTPS pour garantir une connexion sécurisée.
                 </div>
               </div>
             </div>
