@@ -7,9 +7,9 @@ require_once 'config/db-config.php';
  * @param int $user_id ID de l'utilisateur
  * @param string $username Nom d'utilisateur
  * @param string $email Email de l'utilisateur
- * @param bool $is_admin Indique si l'utilisateur est un admin
+ * @param int $is_admin Indique si l'utilisateur est un admin
  */
-function create_secure_session($user_id, $username, $email, $is_admin = false) {
+function create_secure_session($user_id, $username, $email, $is_admin) {
     // Régénérer l'ID de session pour prévenir la fixation de session
     session_regenerate_id(true);
     
@@ -17,9 +17,9 @@ function create_secure_session($user_id, $username, $email, $is_admin = false) {
     $_SESSION['user_id'] = $user_id;
     $_SESSION['username'] = $username;
     $_SESSION['email'] = $email;
-    $_SESSION['is_admin'] = (bool)$is_admin;
+    $_SESSION['is_admin'] = $is_admin;
     
-    // Ajouter des informations supplémentaires de session
+    // // Ajouter des informations supplémentaires de session
     $_SESSION['last_activity'] = time();
     $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
     $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -55,6 +55,10 @@ function create_secure_session($user_id, $username, $email, $is_admin = false) {
 function is_logged_in($admin_only = false) {
     // Vérifier si la session existe et n'a pas expiré
     if (!isset($_SESSION['user_id'])) {
+        return false;
+    }
+
+    if ($admin_only && (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1)) {
         return false;
     }
     
@@ -96,7 +100,7 @@ function destroy_session() {
     $_SESSION = [];
     
     if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
+        $params = session_get_cookie_params();  
         setcookie(session_name(), '', time() - 42000,
             $params["path"], $params["domain"],
             $params["secure"], $params["httponly"]
@@ -133,10 +137,10 @@ function get_user_role() {
     if (!isset($_SESSION['user_id'])) {
         return 'guest';
     }
-    
-    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
+
+    if ($is_admin == 1) {
         return 'admin';
     }
-    
+
     return 'user';
 }

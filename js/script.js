@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const shortenForm = document.getElementById('shorten-form');
   const linkResult = document.getElementById('link-result');
   const copyBtn = document.getElementById('copy-btn');
-  const qrBtn = document.getElementById('qr-btn');
   
   shortenForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -72,10 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // QR code button (would integrate with a real QR code generator)
-  qrBtn.addEventListener('click', function() {
-    alert('Fonctionnalité de code QR simulée. Dans une application réelle, un code QR serait généré ici.');
-  });
 });
 
 // Smooth scrolling for anchor links

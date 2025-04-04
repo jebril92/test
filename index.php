@@ -44,17 +44,6 @@ $user_role = get_user_role();
           <li class="nav-item ms-lg-3">
             <?php if ($user_role === 'guest'): ?>
               <a class="btn btn-primary btn-login" href="login.php">Se connecter</a>
-            <?php elseif ($user_role === 'user'): ?>
-              <div class="dropdown">
-                <a class="btn btn-primary btn-login dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  Mon compte
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord user</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
-                </ul>
-              </div>
             <?php elseif ($user_role === 'admin'): ?>
               <div class="dropdown">
                 <a class="btn btn-danger btn-login dropdown-toggle" href="#" role="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,6 +51,17 @@ $user_role = get_user_role();
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                   <li><a class="dropdown-item" href="admin/dashboard.php">Tableau de bord admin</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
+                </ul>
+              </div>
+            <?php elseif ($user_role === 'user'): ?>
+              <div class="dropdown">
+                <a class="btn btn-primary btn-login dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Mon compte
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord user</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
                 </ul>
