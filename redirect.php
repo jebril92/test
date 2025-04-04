@@ -3,8 +3,22 @@ session_start();
 require_once 'config/db-config.php';
 
 // Récupérer le code court et l'action à effectuer
-$code = isset($_GET['code']) ? trim($_GET['code']) : '';
-$action = isset($_GET['action']) ? trim($_GET['action']) : '';
+$request_uri = $_SERVER['REQUEST_URI'];
+$path_parts = explode('/', trim($request_uri, '/'));
+$code = isset($path_parts[0]) ? trim($path_parts[0]) : '';
+
+// Vérifier si le code se termine par un des dorks (+, *, -)
+$action = '';
+if (substr($code, -1) === '+') {
+    $action = '+';
+    $code = substr($code, 0, -1);
+} elseif (substr($code, -1) === '*') {
+    $action = '*';
+    $code = substr($code, 0, -1);
+} elseif (substr($code, -1) === '-') {
+    $action = '-';
+    $code = substr($code, 0, -1);
+}
 
 // Vérifier si le code est vide
 if (empty($code)) {

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Récupérer l'URL longue
 $originalUrl = isset($_POST['url']) ? trim($_POST['url']) : '';
 $customCode = isset($_POST['custom_code']) ? trim($_POST['custom_code']) : null;
-$expiry = isset($_POST['expiry']) ? intval($_POST['expiry']) : null;
+$expiry = isset($_POST['expiry']) && !empty($_POST['expiry']) ? intval($_POST['expiry']) : null;
 
 // Vérifier que l'URL n'est pas vide
 if (empty($originalUrl)) {
@@ -40,6 +40,9 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    // Définir le fuseau horaire MySQL pour qu'il corresponde à celui de PHP
+    $conn->exec("SET time_zone = '+02:00'");
+    
     // Générer ou utiliser le code court
     if (!empty($customCode)) {
         $shortCode = $customCode;
@@ -59,8 +62,15 @@ try {
     
     // Définir la date d'expiration
     $expiryDatetime = null;
-    if ($expiry !== null) {
-        $expiryDatetime = date('Y-m-d H:i:s', strtotime("+{$expiry} hours"));
+    
+    // Pour les utilisateurs non connectés (guests), le lien expire après 2 heures
+    if ($userId == 1) { // 1 est l'ID des utilisateurs anonymes
+        $expiryDatetime = date('Y-m-d H:i:s', strtotime("+2 hours"));
+    } else {
+        // Pour les utilisateurs connectés, respecter leur choix d'expiration
+        if ($expiry !== null) {
+            $expiryDatetime = date('Y-m-d H:i:s', strtotime("+{$expiry} hours"));
+        }
     }
     
     // Insérer l'URL dans la base de données
@@ -72,7 +82,13 @@ try {
     $stmt->bindParam(':original_url', $originalUrl);
     $stmt->bindParam(':short_code', $shortCode);
     $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->bindParam(':expiry_datetime', $expiryDatetime);
+    
+    // Utiliser PDO::PARAM_NULL pour garantir que null est correctement inséré
+    if ($expiryDatetime === null) {
+        $stmt->bindValue(':expiry_datetime', null, PDO::PARAM_NULL);
+    } else {
+        $stmt->bindParam(':expiry_datetime', $expiryDatetime);
+    }
     
     $stmt->execute();
     
