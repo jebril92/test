@@ -1,10 +1,6 @@
 <?php
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 $login_error = "";
 $register_error = "";
 
@@ -114,8 +110,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             
             if ($user && password_verify($password, $user['password'])) {
                 if ($user['is_verified'] == 1) {
-                    create_secure_session($user['id'], $user['username'], $user['email'], (int)$user['is_admin']);
-                    
+                    create_secure_session($user['id'], $user['username'], $user['email'], $user['is_admin']);
+
                     header("Location: index.php");
                     exit();
                 } else {

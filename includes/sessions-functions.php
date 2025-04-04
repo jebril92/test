@@ -17,7 +17,7 @@ function create_secure_session($user_id, $username, $email, $is_admin = false) {
     $_SESSION['user_id'] = $user_id;
     $_SESSION['username'] = $username;
     $_SESSION['email'] = $email;
-    $_SESSION['is_admin'] = $is_admin;
+    $_SESSION['is_admin'] = (bool)$is_admin;
     
     // Ajouter des informations supplémentaires de session
     $_SESSION['last_activity'] = time();
@@ -116,7 +116,7 @@ function redirect_by_role() {
         exit();
     }
     
-    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
+    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
         header("Location: admin/dashboard.php");
     } else {
         header("Location: dashboard.php");
@@ -134,6 +134,9 @@ function get_user_role() {
         return 'guest';
     }
     
-    $is_admin = isset($_SESSION['is_admin']) ? (int)$_SESSION['is_admin'] : 0;
-    return $is_admin === 1 ? 'admin' : 'user';
+    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
+        return 'admin';
+    }
+    
+    return 'user';
 }

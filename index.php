@@ -4,6 +4,7 @@ require_once 'config/db-config.php';
 require_once 'includes/session-functions.php';
 
 $user_role = get_user_role();
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,7 +50,7 @@ $user_role = get_user_role();
                   Mon compte
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord</a></li>
+                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord user</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
                 </ul>
