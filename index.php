@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'config/db-config.php';
-require_once 'includes/session-functions.php';
+require_once 'includes/sessions-functions.php';
 
 $user_role = get_user_role();
 
@@ -15,6 +15,7 @@ $user_role = get_user_role();
   
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
@@ -61,7 +62,7 @@ $user_role = get_user_role();
                   Mon compte
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord user</a></li>
+                  <li><a class="dropdown-item" href="dashboard.php">Tableau de bord</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
                 </ul>
@@ -171,6 +172,11 @@ $user_role = get_user_role();
                   <i class="fas fa-qrcode me-1"></i> QR Code
                 </button>
               </div>
+            </div>
+
+            <div id="qr-container" style="display: none; margin-top: 15px; text-align: center; background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+              <h5>QR Code pour votre lien :</h5>
+              <div id="qrcode" style="margin: 15px auto;"></div>
             </div>
           </div>
         </div>

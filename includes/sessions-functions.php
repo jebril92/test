@@ -10,21 +10,17 @@ require_once 'config/db-config.php';
  * @param int $is_admin Indique si l'utilisateur est un admin
  */
 function create_secure_session($user_id, $username, $email, $is_admin) {
-    // Régénérer l'ID de session pour prévenir la fixation de session
     session_regenerate_id(true);
     
-    // Stocker les informations de l'utilisateur dans la session
     $_SESSION['user_id'] = $user_id;
     $_SESSION['username'] = $username;
     $_SESSION['email'] = $email;
     $_SESSION['is_admin'] = $is_admin;
     
-    // // Ajouter des informations supplémentaires de session
     $_SESSION['last_activity'] = time();
     $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
     $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
     
-    // Enregistrer la session dans la base de données
     try {
         $conn = new PDO("mysql:host=$GLOBALS[host];dbname=$GLOBALS[dbname]", $GLOBALS['username_db'], $GLOBALS['password_db']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -53,7 +49,6 @@ function create_secure_session($user_id, $username, $email, $is_admin) {
  * @return bool
  */
 function is_logged_in($admin_only = false) {
-    // Vérifier si la session existe et n'a pas expiré
     if (!isset($_SESSION['user_id'])) {
         return false;
     }
@@ -62,16 +57,13 @@ function is_logged_in($admin_only = false) {
         return false;
     }
     
-    // Vérifier l'expiration de la session (30 minutes d'inactivité)
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
         destroy_session();
         return false;
     }
     
-    // Mettre à jour le timestamp d'activité
     $_SESSION['last_activity'] = time();
     
-    // Vérifier si l'utilisateur est un admin si demandé
     if ($admin_only && (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1)) {
         return false;
     }
@@ -83,7 +75,6 @@ function is_logged_in($admin_only = false) {
  * Détruit la session de l'utilisateur
  */
 function destroy_session() {
-    // Supprimer la session de la base de données
     if (isset($_SESSION['user_id'])) {
         try {
             $conn = new PDO("mysql:host=$GLOBALS[host];dbname=$GLOBALS[dbname]", $GLOBALS['username_db'], $GLOBALS['password_db']);
@@ -96,7 +87,6 @@ function destroy_session() {
         }
     }
     
-    // Détruire la session PHP
     $_SESSION = [];
     
     if (ini_get("session.use_cookies")) {
@@ -138,9 +128,5 @@ function get_user_role() {
         return 'guest';
     }
 
-    if ($is_admin == 1) {
-        return 'admin';
-    }
-
-    return 'user';
+    return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1 ? 'admin' : 'user';
 }

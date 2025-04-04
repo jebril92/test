@@ -117,26 +117,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (qrBtn) {
         qrBtn.addEventListener('click', function() {
             const shortUrl = shortUrlDisplay.textContent;
+            const qrContainer = document.getElementById('qr-container');
+            const qrCodeDiv = document.getElementById('qrcode');
             
-            // Créer une URL pour l'API Google Chart pour générer un QR Code
-            const qrCodeUrl = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(shortUrl)}`;
-            
-            // Afficher le QR Code dans une modal ou une nouvelle fenêtre
-            const qrModal = document.getElementById('qr-modal');
-            if (qrModal) {
-                const qrImage = qrModal.querySelector('.qr-image');
-                qrImage.src = qrCodeUrl;
-                qrImage.alt = `QR Code pour ${shortUrl}`;
-                
-                const modalTitle = qrModal.querySelector('.modal-title');
-                modalTitle.textContent = `QR Code pour ${shortUrl}`;
-                
-                // Afficher la modal
-                const modal = new bootstrap.Modal(qrModal);
-                modal.show();
+            if (shortUrl) {
+                // Basculer l'affichage du QR code
+                if (qrContainer.style.display === 'none') {
+                    // Nettoyer d'abord le contenu existant
+                    qrCodeDiv.innerHTML = '';
+                    
+                    // Générer un nouveau QR code
+                    new QRCode(qrCodeDiv, {
+                        text: shortUrl,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    
+                    qrContainer.style.display = 'block';
+                    qrBtn.innerHTML = '<i class="fas fa-times me-1"></i> Masquer QR';
+                } else {
+                    qrContainer.style.display = 'none';
+                    qrBtn.innerHTML = '<i class="fas fa-qrcode me-1"></i> QR Code';
+                }
             } else {
-                // Ouvrir dans une nouvelle fenêtre si la modal n'existe pas
-                window.open(qrCodeUrl, '_blank');
+                console.error("URL courte non disponible");
             }
         });
     }

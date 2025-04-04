@@ -16,10 +16,10 @@ if (file_exists('includes/mail-functions.php')) {
     echo "Erreur: fichier mail-functions.php introuvable";
 }
 
-if (file_exists('includes/session-functions.php')) {
-    include_once 'includes/session-functions.php';
+if (file_exists('includes/sessions-functions.php')) {
+    include_once 'includes/sessions-functions.php';
 } else {
-    echo "Erreur: fichier session-functions introuvable";
+    echo "Erreur: fichier sessions-functions introuvable";
 }
 
 if (isset($_GET['logout'])) {
