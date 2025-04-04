@@ -1,8 +1,3 @@
-/**
- * Dashboard JavaScript
- * Fonctionnalités interactives pour le tableau de bord de URLink
- */
-
 // Initialiser les plugins et gestionnaires d'événements au chargement du document
 document.addEventListener('DOMContentLoaded', function() {
     initializeDataTable();
@@ -10,17 +5,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Initialise la table de données DataTables si elle existe
+ * Initialise la table de données DataTables avec des paramètres personnalisés
  */
 function initializeDataTable() {
     if($('#linksTable').length > 0) {
         $('#linksTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json'
+            "language": {
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "search": "Rechercher :",
+                "zeroRecords": "Aucun résultat trouvé",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "infoEmpty": "Aucune entrée à afficher",
+                "infoFiltered": "(filtré de _MAX_ entrées totales)",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            },
+            "pageLength": 10,
+            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l<"ms-2"f>><"">>' +
+                   'rt' +
+                   '<"d-flex justify-content-between align-items-center mt-3"i<"">p>',
+            "drawCallback": function(settings) {
+                var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                pagination.find('.paginate_button').addClass('btn btn-sm btn-outline-primary mx-1');
+                pagination.find('.paginate_button.current').removeClass('btn-outline-primary').addClass('btn-primary active');
+                pagination.find('.paginate_button.disabled').removeClass('btn-outline-primary').addClass('disabled');
             },
             order: [[2, 'desc']], // Trier par date de création (décroissant)
-            responsive: true,
-            pageLength: 10
+            responsive: true
         });
     }
 }

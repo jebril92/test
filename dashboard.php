@@ -80,7 +80,7 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <link href="css/dashboard.css" rel="stylesheet">
 </head>
@@ -191,85 +191,73 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
                 <h5 class="mb-0">Mes liens raccourcis</h5>
             </div>
             <div class="card-body">
-                <?php if (empty($user_links)): ?>
-                    <div class="text-center py-5">
-                        <div class="display-6 text-muted mb-3">
-                            <i class="fas fa-link-slash"></i>
-                        </div>
-                        <h4 class="text-muted">Vous n'avez pas encore créé de liens raccourcis</h4>
-                        <p class="mb-4">Commencez par créer votre premier lien raccourci !</p>
-                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newLinkModal">
-                            <i class="fas fa-plus-circle me-2"></i> Créer un nouveau lien
-                        </a>
-                    </div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-links" id="linksTable">
-                            <thead>
+                <div class="table-responsive">
+                    <table class="table table-hover table-links" id="linksTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">URL raccourcie</th>
+                                <th class="border-0">URL originale</th>
+                                <th class="border-0">Date de création</th>
+                                <th class="border-0">Expiration</th>
+                                <th class="border-0 text-center">Clics</th>
+                                <th class="border-0 text-center">Statut</th>
+                                <th class="border-0 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($user_links as $link): ?>
                                 <tr>
-                                    <th>URL raccourcie</th>
-                                    <th>URL originale</th>
-                                    <th>Date de création</th>
-                                    <th>Expiration</th>
-                                    <th>Clics</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($user_links as $link): ?>
-                                    <tr>
-                                        <td>
-                                            <a href="<?php echo $base_url . htmlspecialchars($link['short_code']); ?>" target="_blank">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <a href="<?php echo $base_url . htmlspecialchars($link['short_code']); ?>" target="_blank" class="text-decoration-none">
                                                 <?php echo $base_url . htmlspecialchars($link['short_code']); ?>
                                             </a>
-                                            <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="copyToClipboard('<?php echo $base_url . htmlspecialchars($link['short_code']); ?>')">
+                                            <button class="btn btn-sm text-primary ms-2" onclick="copyToClipboard('<?php echo $base_url . htmlspecialchars($link['short_code']); ?>')" title="Copier le lien">
                                                 <i class="fas fa-copy"></i>
                                             </button>
-                                        </td>
-                                        <td class="original-url">
-                                            <a href="<?php echo htmlspecialchars($link['original_url']); ?>" target="_blank" title="<?php echo htmlspecialchars($link['original_url']); ?>">
-                                                <?php echo htmlspecialchars($link['original_url']); ?>
+                                        </div>
+                                    </td>
+                                    <td class="original-url">
+                                        <a href="<?php echo htmlspecialchars($link['original_url']); ?>" target="_blank" title="<?php echo htmlspecialchars($link['original_url']); ?>" class="text-truncate d-inline-block" style="max-width: 300px;">
+                                            <?php echo htmlspecialchars($link['original_url']); ?>
+                                        </a>
+                                    </td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($link['created_at'])); ?></td>
+                                    <td>
+                                        <?php if (empty($link['expiry_datetime'])): ?>
+                                            <span class="text-muted">Jamais</span>
+                                        <?php else: ?>
+                                            <?php echo date('d/m/Y H:i', strtotime($link['expiry_datetime'])); ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center"><?php echo $link['clicks_count']; ?></td>
+                                    <td class="text-center">
+                                        <?php if (empty($link['expiry_datetime']) || strtotime($link['expiry_datetime']) > time()): ?>
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">Actif</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2">Expiré</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="stats.php?id=<?php echo $link['id']; ?>" class="btn btn-sm btn-primary" title="Statistiques">
+                                                <i class="fas fa-chart-bar"></i>
                                             </a>
-                                        </td>
-                                        <td><?php echo date('d/m/Y H:i', strtotime($link['created_at'])); ?></td>
-                                        <td>
-                                            <?php if (empty($link['expiry_datetime'])): ?>
-                                                <span class="text-muted">Jamais</span>
-                                            <?php else: ?>
-                                                <?php echo date('d/m/Y H:i', strtotime($link['expiry_datetime'])); ?>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo $link['clicks_count']; ?></td>
-                                        <td>
-                                            <?php if (empty($link['expiry_datetime']) || strtotime($link['expiry_datetime']) > time()): ?>
-                                                <span class="status-badge bg-success bg-opacity-25 text-success">Actif</span>
-                                            <?php else: ?>
-                                                <span class="status-badge bg-danger bg-opacity-25 text-danger">Expiré</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <a href="stats.php?id=<?php echo $link['id']; ?>" class="btn btn-sm btn-primary btn-icon" title="Statistiques">
-                                                    <i class="fas fa-chart-bar"></i>
-                                                </a>
-                                                <a href="edit_link.php?id=<?php echo $link['id']; ?>" class="btn btn-sm btn-info btn-icon text-white" title="Modifier">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="<?php echo $base_url . htmlspecialchars($link['short_code']); ?>-" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+                                            <a href="edit_link.php?id=<?php echo $link['id']; ?>" class="btn btn-sm btn-info text-white" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="delete_url.php?id=<?php echo $link['id']; ?>&code=<?php echo $link['short_code']; ?>" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce lien?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
     
     <!-- Modal pour créer un nouveau lien -->
     <div class="modal fade" id="newLinkModal" tabindex="-1" aria-labelledby="newLinkModalLabel" aria-hidden="true">
@@ -330,9 +318,9 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>
