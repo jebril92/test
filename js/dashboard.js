@@ -1,12 +1,10 @@
-// Initialiser les plugins et gestionnaires d'événements au chargement du document
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeDataTable();
     setupEventListeners();
 });
 
-/**
- * Initialise la table de données DataTables avec des paramètres personnalisés
- */
+
 function initializeDataTable() {
     if($('#linksTable').length > 0) {
         $('#linksTable').DataTable({
@@ -35,27 +33,19 @@ function initializeDataTable() {
                 pagination.find('.paginate_button.current').removeClass('btn-outline-primary').addClass('btn-primary active');
                 pagination.find('.paginate_button.disabled').removeClass('btn-outline-primary').addClass('disabled');
             },
-            order: [[2, 'desc']], // Trier par date de création (décroissant)
+            order: [[2, 'desc']],
             responsive: true
         });
     }
 }
 
-/**
- * Configure les gestionnaires d'événements
- */
 function setupEventListeners() {
-    // Gestionnaire pour le bouton de création de lien
     const createLinkBtn = document.getElementById('createLinkBtn');
     if (createLinkBtn) {
         createLinkBtn.addEventListener('click', createNewLink);
     }
 }
 
-/**
- * Copie un texte dans le presse-papiers
- * @param {string} text Texte à copier
- */
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
         .then(() => {
@@ -67,18 +57,11 @@ function copyToClipboard(text) {
         });
 }
 
-/**
- * Copie le nouveau lien créé dans le presse-papiers
- */
 function copyNewLink() {
     const shortenedUrl = document.getElementById('shortened_url').value;
     copyToClipboard(shortenedUrl);
 }
 
-/**
- * Affiche une notification toast
- * @param {string} message Message à afficher
- */
 function showToast(message) {
     const toastContainer = document.createElement('div');
     toastContainer.style.position = 'fixed';
@@ -110,9 +93,6 @@ function showToast(message) {
     }, 3000);
 }
 
-/**
- * Crée un nouveau lien raccourci
- */
 function createNewLink() {
     const form = document.getElementById('newLinkForm');
     const modalError = document.getElementById('modalError');
@@ -120,7 +100,6 @@ function createNewLink() {
     
     const formData = new FormData(form);
     
-    // Vérifier que l'URL n'est pas vide
     const originalUrl = formData.get('url');
     if (!originalUrl) {
         modalError.textContent = 'Veuillez entrer une URL valide';
@@ -128,19 +107,16 @@ function createNewLink() {
         return;
     }
     
-    // Afficher les données du formulaire dans la console
     console.log('Envoi des données : ', {
         url: formData.get('url'),
         custom_code: formData.get('custom_code'),
         expiry: formData.get('expiry')
     });
     
-    // Désactiver le bouton pendant le traitement
     const createBtn = document.getElementById('createLinkBtn');
     createBtn.disabled = true;
     createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
     
-    // Envoyer la requête AJAX
     fetch('shorten_url.php', {
         method: 'POST',
         body: formData
@@ -152,7 +128,6 @@ function createNewLink() {
     .then(data => {
         console.log('Données reçues:', data);
         
-        // Réactiver le bouton
         createBtn.disabled = false;
         createBtn.innerHTML = 'Créer le lien';
         
@@ -162,12 +137,10 @@ function createNewLink() {
             return;
         }
         
-        // Afficher le résultat
         document.getElementById('newLinkForm').style.display = 'none';
         document.getElementById('newLinkResult').style.display = 'block';
         document.getElementById('shortened_url').value = data.short_url;
         
-        // Modifier le texte du bouton
         createBtn.innerHTML = 'Créer un autre lien';
         createBtn.onclick = function() {
             document.getElementById('newLinkForm').reset();
@@ -177,13 +150,11 @@ function createNewLink() {
             createBtn.onclick = createNewLink;
         };
         
-        // Recharger la page après un délai
         setTimeout(() => {
             window.location.reload();
         }, 3000);
     })
     .catch(error => {
-        // Réactiver le bouton
         createBtn.disabled = false;
         createBtn.innerHTML = 'Créer le lien';
         

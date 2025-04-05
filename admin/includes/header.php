@@ -9,9 +9,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
     <link href="css/admin.css" rel="stylesheet">
+    <link href="../css/dark-theme.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
         <div class="container-fluid">
             <a class="navbar-brand" href="dashboard.php">
@@ -65,10 +65,8 @@
         </div>
     </nav>
 
-    <!-- Content Container -->
     <div class="container-fluid admin-container">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
@@ -124,5 +122,4 @@
                 </div>
             </div>
             
-            <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-4">

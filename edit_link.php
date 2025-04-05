@@ -3,13 +3,11 @@ session_start();
 require_once 'config/db-config.php';
 require_once 'includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est connecté
 if (!is_logged_in()) {
     header("Location: login.php?message=login_required");
     exit();
 }
 
-// Récupérer l'ID de l'URL à éditer
 $url_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($url_id <= 0) {
@@ -25,7 +23,6 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Vérifier que l'URL existe et appartient à l'utilisateur
     $stmt = $conn->prepare("
         SELECT * FROM shortened_urls 
         WHERE id = ? AND (user_id = ? OR ? = 1)
@@ -38,7 +35,6 @@ try {
         exit();
     }
     
-    // Traitement du formulaire de modification
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $original_url = trim($_POST['original_url']);
         $short_code = trim($_POST['short_code']);
@@ -51,7 +47,6 @@ try {
         } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $short_code)) {
             $error = "Le code court ne peut contenir que des lettres et des chiffres.";
         } else {
-            // Vérifier si le code court existe déjà (sauf s'il s'agit du même lien)
             $stmt = $conn->prepare("
                 SELECT COUNT(*) FROM shortened_urls 
                 WHERE short_code = ? AND id != ?
@@ -61,13 +56,11 @@ try {
             if ($stmt->fetchColumn() > 0) {
                 $error = "Ce code court est déjà utilisé. Veuillez en choisir un autre.";
             } else {
-                // Définir la date d'expiration
                 $expiryDatetime = null;
                 if (!empty($expiry)) {
                     $expiryDatetime = date('Y-m-d H:i:s', strtotime("+{$expiry} hours"));
                 }
                 
-                // Mettre à jour l'URL dans la base de données
                 $stmt = $conn->prepare("
                     UPDATE shortened_urls 
                     SET original_url = ?, short_code = ?, expiry_datetime = ?
@@ -78,7 +71,6 @@ try {
                 
                 $success = true;
                 
-                // Mettre à jour les informations de l'URL
                 $stmt = $conn->prepare("SELECT * FROM shortened_urls WHERE id = ?");
                 $stmt->execute([$url_id]);
                 $url_info = $stmt->fetch(PDO::FETCH_ASSOC);

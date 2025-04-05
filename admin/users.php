@@ -3,7 +3,6 @@ session_start();
 require_once '../config/db-config.php';
 require_once '../includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est un administrateur
 if (!is_logged_in(true)) {
     header("Location: ../login.php?message=unauthorized");
     exit();
@@ -20,9 +19,7 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Action de suppression d'un utilisateur
     if ($action === 'delete' && $user_id > 0) {
-        // Vérifier que l'utilisateur n'est pas l'utilisateur courant
         if ($user_id === $_SESSION['user_id']) {
             $error = "Vous ne pouvez pas supprimer votre propre compte.";
         } else {
@@ -35,7 +32,6 @@ try {
         }
     }
     
-    // Action de mise à jour d'un utilisateur
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
         $update_id = intval($_POST['user_id']);
         $username = trim($_POST['username']);
@@ -48,7 +44,6 @@ try {
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = "L'adresse email est invalide.";
         } else {
-            // Vérifier si le nom d'utilisateur ou l'email existe déjà (sauf pour le même utilisateur)
             $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
             $stmt->execute([$username, $email, $update_id]);
             
@@ -64,7 +59,6 @@ try {
                 
                 $success = "L'utilisateur a été mis à jour avec succès.";
                 
-                // Si l'utilisateur modifie son propre compte
                 if ($update_id === $_SESSION['user_id']) {
                     $_SESSION['username'] = $username;
                     $_SESSION['email'] = $email;
@@ -74,7 +68,6 @@ try {
         }
     }
     
-    // Récupérer les informations d'un utilisateur spécifique pour modification
     if ($action === 'edit' && $user_id > 0) {
         $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
@@ -86,7 +79,6 @@ try {
         }
     }
     
-    // Récupérer tous les utilisateurs
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $limit = 10;
@@ -155,7 +147,6 @@ include 'includes/header.php';
     <?php endif; ?>
     
     <?php if ($action === 'edit' && $user_info): ?>
-        <!-- Formulaire de modification d'utilisateur -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Modifier l'utilisateur</h5>
@@ -197,7 +188,6 @@ include 'includes/header.php';
             </div>
         </div>
     <?php else: ?>
-        <!-- Liste des utilisateurs -->
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">

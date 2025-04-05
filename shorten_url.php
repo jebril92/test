@@ -3,52 +3,41 @@ header('Content-Type: application/json');
 session_start();
 require_once 'config/db-config.php';
 
-// Vérifier si les données ont été envoyées en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['status' => 'error', 'message' => 'Méthode non autorisée']);
     exit;
 }
 
-// Récupérer l'URL longue
 $originalUrl = isset($_POST['url']) ? trim($_POST['url']) : '';
 $customCode = isset($_POST['custom_code']) ? trim($_POST['custom_code']) : null;
 $expiry = isset($_POST['expiry']) && !empty($_POST['expiry']) ? intval($_POST['expiry']) : null;
 
-// Vérifier que l'URL n'est pas vide
 if (empty($originalUrl)) {
     echo json_encode(['status' => 'error', 'message' => 'L\'URL ne peut pas être vide']);
     exit;
 }
 
-// Récupérer l'ID utilisateur s'il est connecté, sinon utiliser l'ID anonyme (1)
 $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
 
-// Si un code personnalisé est demandé, vérifier que l'utilisateur est connecté
 if (!empty($customCode) && $userId == 1) {
     echo json_encode(['status' => 'error', 'message' => 'Vous devez être connecté pour créer un code personnalisé']);
     exit;
 }
 
-// Vérifier que le code personnalisé ne contient que des caractères alphanumériques
 if (!empty($customCode) && !preg_match('/^[a-zA-Z0-9]+$/', $customCode)) {
     echo json_encode(['status' => 'error', 'message' => 'Le code personnalisé ne peut contenir que des lettres et des chiffres']);
     exit;
 }
 
 try {
-    // Créer la connexion PDO
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Définir le fuseau horaire MySQL pour qu'il corresponde à celui de PHP
     $conn->exec("SET time_zone = '+02:00'");
     
-    // Gestion des limites d'utilisation
     $ip_address = $_SERVER['REMOTE_ADDR'];
     
-    // Si l'utilisateur n'est pas connecté, vérifier les limites par IP
-    if ($userId == 1) { // 1 est l'ID des utilisateurs anonymes
-        // Vérifier combien de liens cette IP a créés dans les dernières 24 heures
+    if ($userId == 1) {
         $stmt = $conn->prepare("
             SELECT COUNT(*) FROM shortened_urls 
             WHERE user_id = 1 
@@ -58,7 +47,6 @@ try {
         $stmt->execute([$ip_address]);
         $link_count = $stmt->fetchColumn();
         
-        // Limite : 10 liens par jour pour les utilisateurs non connectés
         $max_links_per_day = 10;
         
         if ($link_count >= $max_links_per_day) {
@@ -69,18 +57,13 @@ try {
             exit;
         }
         
-        // Ajouter l'IP à l'enregistrement pour les utilisateurs anonymes
         $ip_track = $ip_address;
     } else {
-        // Pour les utilisateurs connectés, vérifier leur limite globale
-        // Récupérer la limite depuis les paramètres
         $stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'max_links_per_user'");
         $stmt->execute();
         $max_links_per_user = (int) $stmt->fetchColumn();
         
-        // Si la limite n'est pas illimitée (0)
         if ($max_links_per_user > 0) {
-            // Compter les liens de l'utilisateur
             $stmt = $conn->prepare("SELECT COUNT(*) FROM shortened_urls WHERE user_id = ?");
             $stmt->execute([$userId]);
             $user_links_count = $stmt->fetchColumn();
@@ -94,14 +77,12 @@ try {
             }
         }
         
-        $ip_track = null; // Pour les utilisateurs connectés, pas besoin de suivre l'IP
+        $ip_track = null;
     }
     
-    // Générer ou utiliser le code court
     if (!empty($customCode)) {
         $shortCode = $customCode;
         
-        // Vérifier si le code personnalisé existe déjà
         $stmt = $conn->prepare("SELECT COUNT(*) FROM shortened_urls WHERE short_code = ?");
         $stmt->execute([$shortCode]);
         
@@ -110,24 +91,19 @@ try {
             exit;
         }
     } else {
-        // Générer un code court aléatoire
         $shortCode = generateUniqueCode($conn);
     }
     
-    // Définir la date d'expiration
     $expiryDatetime = null;
     
-    // Pour les utilisateurs non connectés (guests), le lien expire après 2 heures
-    if ($userId == 1) { // 1 est l'ID des utilisateurs anonymes
+    if ($userId == 1) {
         $expiryDatetime = date('Y-m-d H:i:s', strtotime("+2 hours"));
     } else {
-        // Pour les utilisateurs connectés, respecter leur choix d'expiration
         if ($expiry !== null) {
             $expiryDatetime = date('Y-m-d H:i:s', strtotime("+{$expiry} hours"));
         }
     }
     
-    // Insérer l'URL dans la base de données
     $stmt = $conn->prepare("
         INSERT INTO shortened_urls (original_url, short_code, user_id, ip_address, created_at, expiry_datetime)
         VALUES (:original_url, :short_code, :user_id, :ip_address, NOW(), :expiry_datetime)
@@ -138,7 +114,6 @@ try {
     $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
     $stmt->bindParam(':ip_address', $ip_track);
     
-    // Utiliser PDO::PARAM_NULL pour garantir que null est correctement inséré
     if ($expiryDatetime === null) {
         $stmt->bindValue(':expiry_datetime', null, PDO::PARAM_NULL);
     } else {
@@ -147,10 +122,8 @@ try {
     
     $stmt->execute();
     
-    // Récupérer l'ID de l'URL insérée
     $urlId = $conn->lastInsertId();
     
-    // Récupérer les détails de l'URL raccourcie
     $stmt = $conn->prepare("
         SELECT id, original_url, short_code, created_at, expiry_datetime
         FROM shortened_urls
@@ -159,11 +132,9 @@ try {
     $stmt->execute([$urlId]);
     $urlInfo = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Construire l'URL complète
     $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]/";
     $shortUrl = $baseUrl . $urlInfo['short_code'];
     
-    // Renvoyer le résultat
     echo json_encode([
         'status' => 'success',
         'original_url' => $originalUrl,
@@ -174,18 +145,10 @@ try {
     ]);
     
 } catch(PDOException $e) {
-    // En mode développement, vous pouvez renvoyer le message d'erreur complet
     echo json_encode(['status' => 'error', 'message' => 'Erreur de base de données: ' . $e->getMessage()]);
     exit;
 }
 
-/**
- * Génère un code court unique
- * 
- * @param PDO $conn Connexion à la base de données
- * @param int $length Longueur du code à générer
- * @return string Code court unique
- */
 function generateUniqueCode($conn, $length = 6) {
     $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $maxTentatives = 10;
@@ -198,7 +161,6 @@ function generateUniqueCode($conn, $length = 6) {
             $code .= $caracteres[random_int(0, strlen($caracteres) - 1)];
         }
         
-        // Vérifier si le code existe déjà
         $stmt = $conn->prepare("SELECT COUNT(*) FROM shortened_urls WHERE short_code = ?");
         $stmt->execute([$code]);
         
@@ -207,7 +169,6 @@ function generateUniqueCode($conn, $length = 6) {
         }
     }
     
-    // Si génération impossible après plusieurs tentatives, utiliser un timestamp
     return substr(base_convert(time(), 10, 36), 0, $length);
 }
 ?>

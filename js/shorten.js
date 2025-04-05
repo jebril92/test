@@ -10,25 +10,20 @@ document.addEventListener('DOMContentLoaded', function() {
         shortenForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Récupérer l'URL longue
             const longUrl = longUrlInput.value.trim();
             
-            // Vérifier que l'URL n'est pas vide
             if (!longUrl) {
                 showMessage('Veuillez entrer une URL valide', 'error');
                 return;
             }
             
-            // Désactiver le bouton de soumission pendant le traitement
             const submitBtn = shortenForm.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
             
-            // Préparer les données pour la requête AJAX
             const formData = new FormData();
             formData.append('url', longUrl);
             
-            // Récupérer le code personnalisé et l'expiration si présents dans le formulaire
             const customCodeInput = document.getElementById('custom-code');
             const expirySelect = document.getElementById('expiry');
             
@@ -40,14 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('expiry', expirySelect.value);
             }
             
-            // Envoyer la requête AJAX
             fetch('shorten_url.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                // Réactiver le bouton de soumission
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Raccourcir';
                 
@@ -56,11 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                // Afficher l'URL raccourcie
                 shortUrlDisplay.textContent = data.short_url;
                 linkResult.style.display = 'block';
                 
-                // Ajouter les informations supplémentaires si présentes dans la UI
                 const infoContainer = document.getElementById('link-info-container');
                 if (infoContainer) {
                     const createdAtElement = document.getElementById('created-at');
@@ -78,10 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Scroll jusqu'au résultat
                 linkResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 
-                // Enregistrer dans l'historique si l'élément existe
                 if (typeof updateUrlHistory === 'function') {
                     updateUrlHistory(data);
                 }
@@ -95,12 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Fonctionnalité du bouton de copie
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
             const shortUrl = shortUrlDisplay.textContent;
             navigator.clipboard.writeText(shortUrl).then(function() {
-                // Changer le texte du bouton temporairement
                 const originalText = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copié!';
                 
@@ -113,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Fonctionnalité du bouton QR Code
     if (qrBtn) {
         qrBtn.addEventListener('click', function() {
             const shortUrl = shortUrlDisplay.textContent;
@@ -121,12 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const qrCodeDiv = document.getElementById('qrcode');
             
             if (shortUrl) {
-                // Basculer l'affichage du QR code
                 if (qrContainer.style.display === 'none') {
-                    // Nettoyer d'abord le contenu existant
                     qrCodeDiv.innerHTML = '';
                     
-                    // Générer un nouveau QR code
                     new QRCode(qrCodeDiv, {
                         text: shortUrl,
                         width: 200,
@@ -148,17 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    /**
-     * Affiche un message d'erreur ou de succès
-     * 
-     * @param {string} message Message à afficher
-     * @param {string} type Type de message ('error' ou 'success')
-     */
     function showMessage(message, type) {
-        // Vérifier si le conteneur de message existe
         let messageContainer = document.getElementById('message-container');
         
-        // Créer le conteneur s'il n'existe pas
         if (!messageContainer) {
             messageContainer = document.createElement('div');
             messageContainer.id = 'message-container';
@@ -166,10 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
             shortenForm.parentNode.insertBefore(messageContainer, linkResult);
         }
         
-        // Définir la classe CSS en fonction du type de message
         const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
         
-        // Créer le message
         messageContainer.innerHTML = `
             <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
                 ${message}
@@ -177,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Faire disparaître le message après 5 secondes
         setTimeout(function() {
             const alertElement = messageContainer.querySelector('.alert');
             if (alertElement) {
@@ -187,12 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
-    /**
-     * Formate une date au format lisible
-     * 
-     * @param {string} dateStr Date au format SQL
-     * @return {string} Date formatée
-     */
     function formatDate(dateStr) {
         if (!dateStr) return '';
         

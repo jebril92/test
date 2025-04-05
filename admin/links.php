@@ -3,7 +3,6 @@ session_start();
 require_once '../config/db-config.php';
 require_once '../includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est un administrateur
 if (!is_logged_in(true)) {
     header("Location: ../login.php?message=unauthorized");
     exit();
@@ -20,13 +19,10 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Action de suppression d'un lien
     if ($action === 'delete' && $link_id > 0) {
-        // Supprimer les statistiques du lien
         $stmt = $conn->prepare("DELETE FROM click_stats WHERE url_id = ?");
         $stmt->execute([$link_id]);
         
-        // Supprimer le lien
         $stmt = $conn->prepare("DELETE FROM shortened_urls WHERE id = ?");
         $stmt->execute([$link_id]);
         
@@ -35,7 +31,6 @@ try {
         exit();
     }
     
-    // Action de mise à jour d'un lien
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_link'])) {
         $update_id = intval($_POST['link_id']);
         $original_url = trim($_POST['original_url']);
@@ -49,7 +44,6 @@ try {
         } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $short_code)) {
             $error = "Le code court ne peut contenir que des lettres et des chiffres.";
         } else {
-            // Vérifier si le code court existe déjà (sauf pour le même lien)
             $stmt = $conn->prepare("SELECT COUNT(*) FROM shortened_urls WHERE short_code = ? AND id != ?");
             $stmt->execute([$short_code, $update_id]);
             
@@ -70,7 +64,6 @@ try {
         }
     }
     
-    // Récupérer les informations d'un lien spécifique pour modification
     if ($action === 'edit' && $link_id > 0) {
         $stmt = $conn->prepare("
             SELECT s.*, u.username 
@@ -87,7 +80,6 @@ try {
         }
     }
     
-    // Récupérer tous les liens
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $limit = 10;
@@ -137,7 +129,6 @@ try {
     $error = "Erreur de base de données: " . $e->getMessage();
 }
 
-// URL de base
 $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]/";
 
 include 'includes/header.php';
@@ -179,7 +170,6 @@ include 'includes/header.php';
     <?php endif; ?>
     
     <?php if ($action === 'edit' && $link_info): ?>
-        <!-- Formulaire de modification d'un lien -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Modifier le lien</h5>
@@ -245,7 +235,6 @@ include 'includes/header.php';
             </div>
         </div>
     <?php else: ?>
-        <!-- Liste des liens -->
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">

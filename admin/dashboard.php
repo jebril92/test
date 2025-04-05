@@ -23,25 +23,21 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Statistiques utilisateurs
     $stmt = $conn->query("SELECT COUNT(*) FROM users");
     $total_users = $stmt->fetchColumn();
     
     $stmt = $conn->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $active_users = $stmt->fetchColumn();
     
-    // Statistiques liens
     $stmt = $conn->query("SELECT COUNT(*) FROM shortened_urls");
     $total_links = $stmt->fetchColumn();
     
     $stmt = $conn->query("SELECT COUNT(*) FROM click_stats");
     $total_clicks = $stmt->fetchColumn();
     
-    // Utilisateurs récents
     $stmt = $conn->query("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC LIMIT 5");
     $recent_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Liens récents
     $stmt = $conn->query("
         SELECT s.*, u.username 
         FROM shortened_urls s 
@@ -54,7 +50,6 @@ try {
     $error = "Erreur de base de données: " . $e->getMessage();
 }
 
-// URL de base
 $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]/";
 ?>
 
@@ -68,7 +63,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
         </div>
     </div>
     
-    <!-- Statistiques globales -->
     <div class="row mt-4">
         <div class="col-md-3">
             <div class="card bg-primary text-white">
@@ -136,9 +130,7 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
         </div>
     </div>
     
-    <!-- Graphiques et tableaux -->
     <div class="row mt-4">
-        <!-- Derniers utilisateurs inscrits -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
@@ -178,7 +170,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             </div>
         </div>
         
-        <!-- Derniers liens raccourcis -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">

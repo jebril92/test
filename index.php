@@ -24,6 +24,8 @@ $user_role = get_user_role();
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="favicon/site.webmanifest">
+  <link href="css/dark-theme.css" rel="stylesheet">
+  
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
@@ -48,6 +50,11 @@ $user_role = get_user_role();
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#faq">FAQ</a>
+          </li>
+          <li class="nav-item ms-2">
+            <button id="theme-toggle" class="btn btn-link nav-link theme-toggle-icon" aria-label="Changer de thème">
+              <i class="fas fa-moon"></i>
+            </button>
           </li>
           <li class="nav-item ms-lg-3">
             <?php if ($user_role === 'guest'): ?>
@@ -516,5 +523,6 @@ $user_role = get_user_role();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="js/script.js"></script>
   <script src="js/shorten.js"></script>
+  <script src="js/theme-switcher.js"></script>
 </body>
 </html>

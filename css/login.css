@@ -32,7 +32,7 @@ body {
     overflow: hidden;
     width: 850px;
     max-width: 100%;
-    min-height: 600px; /* Increased min-height */
+    min-height: 600px;
 }
 
 .container p {
@@ -83,7 +83,7 @@ body {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 40px 40px; /* Added top and bottom padding */
+    padding: 40px 40px;
     height: 100%;
     overflow-y: auto;
 }
@@ -129,14 +129,13 @@ body {
     z-index: 1;
     max-height: 100%;
     overflow-y: auto;
-    /* Added styling for sign-up scrollable content */
     display: flex;
     flex-direction: column;
 }
 
 .sign-up form {
-    padding-top: 40px; /* Extra padding at the top */
-    padding-bottom: 40px; /* Extra padding at the bottom */
+    padding-top: 40px;
+    padding-bottom: 40px;
 }
 
 .container.active .sign-up {
@@ -350,7 +349,6 @@ body {
     }
 }
 
-/* Custom scrollbar for better aesthetics */
 .sign-up::-webkit-scrollbar {
     width: 6px;
 }
@@ -382,7 +380,6 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Ajustez la position du container quand le message de maintenance est affiché */
 body:has(.maintenance-alert) .container {
     margin-top: 50px;
 }

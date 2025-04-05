@@ -3,13 +3,11 @@ session_start();
 require_once 'config/db-config.php';
 require_once 'includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est connecté
 if (!is_logged_in()) {
     header("Location: login.php?message=login_required");
     exit();
 }
 
-// Récupérer l'ID de l'URL à supprimer et le code court pour la vérification
 $url_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $code = isset($_GET['code']) ? trim($_GET['code']) : '';
 $confirmation = isset($_GET['confirm']) && $_GET['confirm'] == 'yes';
@@ -26,7 +24,6 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Vérifier que l'URL existe et appartient à l'utilisateur
     $stmt = $conn->prepare("
         SELECT s.*, u.username 
         FROM shortened_urls s 
@@ -41,17 +38,13 @@ try {
         exit();
     }
     
-    // Si l'utilisateur a confirmé la suppression
     if ($confirmation) {
-        // Supprimer les statistiques associées
         $stmt = $conn->prepare("DELETE FROM click_stats WHERE url_id = ?");
         $stmt->execute([$url_id]);
         
-        // Supprimer l'URL
         $stmt = $conn->prepare("DELETE FROM shortened_urls WHERE id = ?");
         $stmt->execute([$url_id]);
         
-        // Rediriger vers le tableau de bord avec un message de succès
         header("Location: dashboard.php?success=url_deleted");
         exit();
     }
@@ -80,7 +73,6 @@ $short_url = $base_url . $url_info['short_code'];
     <link rel="manifest" href="favicon/site.webmanifest">
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="index.php">

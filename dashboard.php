@@ -3,17 +3,14 @@ session_start();
 require_once 'config/db-config.php';
 require_once 'includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est connecté
 if (!is_logged_in()) {
     header("Location: login.php?message=login_required");
     exit();
 }
 
-// Récupérer les messages d'erreur ou de succès depuis l'URL
 $error = isset($_GET['error']) ? $_GET['error'] : '';
 $success = isset($_GET['success']) ? $_GET['success'] : '';
 
-// Variables pour les données
 $user_links = [];
 $total_clicks = 0;
 $active_links = 0;
@@ -23,12 +20,10 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Récupérer les informations de l'utilisateur
     $stmt = $conn->prepare("SELECT username, email, created_at FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user_info = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Récupérer tous les liens de l'utilisateur
     $stmt = $conn->prepare("
         SELECT s.*, 
                (SELECT COUNT(*) FROM click_stats WHERE url_id = s.id) as clicks_count
@@ -39,7 +34,6 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $user_links = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Calculer les statistiques
     foreach ($user_links as $link) {
         $total_clicks += $link['clicks_count'];
         
@@ -54,7 +48,6 @@ try {
     $error = "database_error";
 }
 
-// Messages d'erreur et de succès
 $error_messages = [
     'url_not_found' => 'Le lien demandé n\'existe pas ou n\'appartient pas à votre compte.',
     'invalid_url' => 'L\'URL fournie est invalide.',
@@ -67,7 +60,6 @@ $success_messages = [
     'url_updated' => 'Le lien a été mis à jour avec succès.'
 ];
 
-// URL de base
 $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]/";
 ?>
 
@@ -83,13 +75,13 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <link href="css/dashboard.css" rel="stylesheet">
+    <link href="css/dark-theme.css" rel="stylesheet">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="index.php">
@@ -128,7 +120,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     </nav>
 
     <div class="container mt-5 pt-5">
-        <!-- Messages d'erreur et de succès -->
         <?php if (!empty($error) && isset($error_messages[$error])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-circle me-2"></i> <?php echo $error_messages[$error]; ?>
@@ -143,7 +134,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             </div>
         <?php endif; ?>
         
-        <!-- Bienvenue et statistiques -->
         <div class="user-welcome">
             <div class="row align-items-center">
                 <div class="col-md-8">
@@ -158,7 +148,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             </div>
         </div>
         
-        <!-- Statistiques -->
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="stats-card bg-primary text-white">
@@ -189,7 +178,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             </div>
         </div>
         
-        <!-- Tableau des liens -->
         <div class="card shadow-sm mb-5">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">Mes liens raccourcis</h5>
@@ -263,7 +251,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             </div>
         </div>
     
-    <!-- Modal pour créer un nouveau lien -->
     <div class="modal fade" id="newLinkModal" tabindex="-1" aria-labelledby="newLinkModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -326,5 +313,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
     <script src="js/dashboard.js"></script>
+    <script src="js/theme-switcher.js"></script>
 </body>
 </html>

@@ -3,13 +3,11 @@ session_start();
 require_once 'config/db-config.php';
 require_once 'includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est connecté
 if (!is_logged_in()) {
     header("Location: login.php?message=login_required");
     exit();
 }
 
-// Récupérer l'ID de l'URL depuis l'URL
 $url_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($url_id <= 0) {
@@ -17,7 +15,6 @@ if ($url_id <= 0) {
     exit();
 }
 
-// Variables pour les données
 $url_info = null;
 $click_stats_by_day = [];
 $click_stats_by_hour = [];
@@ -32,7 +29,6 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Vérifier que l'URL existe et appartient à l'utilisateur
     $stmt = $conn->prepare("SELECT s.*, u.username 
                            FROM shortened_urls s 
                            JOIN users u ON s.user_id = u.id 
@@ -45,12 +41,10 @@ try {
         exit();
     }
     
-    // Récupérer le nombre total de clics
     $stmt = $conn->prepare("SELECT COUNT(*) FROM click_stats WHERE url_id = ?");
     $stmt->execute([$url_id]);
     $total_clicks = $stmt->fetchColumn();
     
-    // Récupérer les statistiques de clics par jour
     $stmt = $conn->prepare("
         SELECT 
             DATE(date_clicked) as click_date,
@@ -73,17 +67,14 @@ try {
         $hour = (int)$stat['click_hour'];
         $count = (int)$stat['count'];
         
-        // Agréger par jour
         if (!isset($daily_data[$date])) {
             $daily_data[$date] = 0;
         }
         $daily_data[$date] += $count;
         
-        // Agréger par heure
         $hours_data[$hour] += $count;
     }
     
-    // Formater pour l'affichage du graphique par jour
     $click_stats_by_day = [];
     foreach ($daily_data as $date => $count) {
         $click_stats_by_day[] = [
@@ -92,7 +83,6 @@ try {
         ];
     }
     
-    // Récupérer les statistiques par navigateur (simple version)
     $stmt = $conn->prepare("
         SELECT 
             CASE
@@ -113,7 +103,6 @@ try {
     $stmt->execute([$url_id]);
     $click_stats_by_browser = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Récupérer les statistiques par plateforme (OS)
     $stmt = $conn->prepare("
         SELECT 
             CASE
@@ -133,7 +122,6 @@ try {
     $stmt->execute([$url_id]);
     $click_stats_by_platform = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Récupérer les statistiques par référent (sites d'origine)
     $stmt = $conn->prepare("
         SELECT 
             CASE
@@ -155,8 +143,6 @@ try {
     $stmt->execute([$url_id]);
     $click_stats_by_referrer = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Récupérer les statistiques par emplacement géographique
-    // Note: Cette partie dépend de comment vous stockez les données de localisation
     if ($conn->query("SHOW COLUMNS FROM click_stats LIKE 'location'")->rowCount() > 0) {
         $stmt = $conn->prepare("
             SELECT 
@@ -172,7 +158,6 @@ try {
         $click_stats_by_location = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    // Récupérer les clics récents
     $stmt = $conn->prepare("
         SELECT 
             date_clicked,
@@ -215,7 +200,6 @@ $short_url = $base_url . $url_info['short_code'];
     
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="index.php">
@@ -279,7 +263,6 @@ $short_url = $base_url . $url_info['short_code'];
         </div>
         
         <div class="row">
-            <!-- Graphique des clics par jour -->
             <div class="col-lg-8 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -291,7 +274,6 @@ $short_url = $base_url . $url_info['short_code'];
                 </div>
             </div>
             
-            <!-- Graphique des clics par heure -->
             <div class="col-lg-4 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -303,7 +285,6 @@ $short_url = $base_url . $url_info['short_code'];
                 </div>
             </div>
             
-            <!-- Graphique des navigateurs -->
             <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -315,7 +296,6 @@ $short_url = $base_url . $url_info['short_code'];
                 </div>
             </div>
             
-            <!-- Graphique des plateformes -->
             <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -328,7 +308,6 @@ $short_url = $base_url . $url_info['short_code'];
             </div>
             
             <?php if (!empty($click_stats_by_referrer)): ?>
-            <!-- Graphique des référents -->
             <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -342,7 +321,6 @@ $short_url = $base_url . $url_info['short_code'];
             <?php endif; ?>
             
             <?php if (!empty($click_stats_by_location)): ?>
-            <!-- Graphique des localisations -->
             <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
@@ -356,7 +334,6 @@ $short_url = $base_url . $url_info['short_code'];
             <?php endif; ?>
         </div>
         
-        <!-- Tableau des clics récents -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5>Derniers clics</h5>
@@ -419,7 +396,6 @@ $short_url = $base_url . $url_info['short_code'];
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Fonction pour copier l'URL
         function copyToClipboard() {
             const shortUrl = document.getElementById('short-url').textContent;
             navigator.clipboard.writeText(shortUrl)
@@ -431,9 +407,7 @@ $short_url = $base_url . $url_info['short_code'];
                 });
         }
         
-        // Initialiser les graphiques
         document.addEventListener('DOMContentLoaded', function() {
-            // Graphique des clics par jour
             const ctxDay = document.getElementById('clicksByDayChart').getContext('2d');
             new Chart(ctxDay, {
                 type: 'line',
@@ -466,7 +440,6 @@ $short_url = $base_url . $url_info['short_code'];
                 }
             });
             
-            // Graphique des clics par heure
             const ctxHour = document.getElementById('clicksByHourChart').getContext('2d');
             new Chart(ctxHour, {
                 type: 'bar',
@@ -497,8 +470,7 @@ $short_url = $base_url . $url_info['short_code'];
                     maintainAspectRatio: false
                 }
             });
-            
-            // Graphique des navigateurs
+
             const ctxBrowser = document.getElementById('browserChart').getContext('2d');
             new Chart(ctxBrowser, {
                 type: 'doughnut',
@@ -536,7 +508,6 @@ $short_url = $base_url . $url_info['short_code'];
                 }
             });
             
-            // Graphique des plateformes
             const ctxPlatform = document.getElementById('platformChart').getContext('2d');
             new Chart(ctxPlatform, {
                 type: 'pie',
@@ -573,7 +544,6 @@ $short_url = $base_url . $url_info['short_code'];
             });
             
             <?php if (!empty($click_stats_by_referrer)): ?>
-            // Graphique des référents
             const ctxReferrer = document.getElementById('referrerChart').getContext('2d');
             new Chart(ctxReferrer, {
                 type: 'polarArea',
@@ -603,7 +573,6 @@ $short_url = $base_url . $url_info['short_code'];
             <?php endif; ?>
             
             <?php if (!empty($click_stats_by_location)): ?>
-            // Graphique des localisations
             const ctxLocation = document.getElementById('locationChart').getContext('2d');
             new Chart(ctxLocation, {
                 type: 'bar',

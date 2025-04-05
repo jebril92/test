@@ -1,14 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db-config.php';
 
-/**
- * Crée une session sécurisée pour l'utilisateur
- * 
- * @param int $user_id ID de l'utilisateur
- * @param string $username Nom d'utilisateur
- * @param string $email Email de l'utilisateur
- * @param int $is_admin Indique si l'utilisateur est un admin
- */
 function create_secure_session($user_id, $username, $email, $is_admin) {
     session_regenerate_id(true);
     
@@ -37,17 +29,10 @@ function create_secure_session($user_id, $username, $email, $is_admin) {
             ':payload' => serialize($_SESSION)
         ]);
     } catch(PDOException $e) {
-        // Log de l'erreur sans l'afficher à l'utilisateur
         error_log("Erreur lors de l'enregistrement de la session : " . $e->getMessage());
     }
 }
 
-/**
- * Vérifie si l'utilisateur est connecté
- * 
- * @param bool $admin_only Vérifie si l'utilisateur est un admin
- * @return bool
- */
 function is_logged_in($admin_only = false) {
     if (!isset($_SESSION['user_id'])) {
         return false;
@@ -71,9 +56,6 @@ function is_logged_in($admin_only = false) {
     return true;
 }
 
-/**
- * Détruit la session de l'utilisateur
- */
 function destroy_session() {
     if (isset($_SESSION['user_id'])) {
         try {
@@ -101,9 +83,6 @@ function destroy_session() {
     session_destroy();
 }
 
-/**
- * Redirige l'utilisateur en fonction de son rôle
- */
 function redirect_by_role() {
     if (!is_logged_in()) {
         header("Location: login.php");
@@ -118,11 +97,6 @@ function redirect_by_role() {
     exit();
 }
 
-/**
- * Vérifie et récupère le rôle de l'utilisateur
- * 
- * @return string 'admin', 'user', ou 'guest'
- */
 function get_user_role() {
     if (!isset($_SESSION['user_id'])) {
         return 'guest';

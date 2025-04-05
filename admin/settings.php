@@ -3,7 +3,6 @@ session_start();
 require_once '../config/db-config.php';
 require_once '../includes/sessions-functions.php';
 
-// Vérifier que l'utilisateur est un administrateur
 if (!is_logged_in(true)) {
     header("Location: ../login.php?message=unauthorized");
     exit();
@@ -12,26 +11,22 @@ if (!is_logged_in(true)) {
 $error = "";
 $success = "";
 
-// Configuration du site
 $site_settings = [
     'site_name' => 'URLink',
     'admin_email' => '',
     'max_links_per_user' => 50,
-    'default_link_expiry' => 0, // 0 = pas d'expiration
-    'guest_links_expiry' => 48, // en heures
+    'default_link_expiry' => 0,
+    'guest_links_expiry' => 48,
     'allow_guest_links' => 1,
     'maintenance_mode' => 0
 ];
 
-// Charger les paramètres depuis la base de données
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si la table settings existe
     $stmt = $conn->query("SHOW TABLES LIKE 'settings'");
     if ($stmt->rowCount() == 0) {
-        // Créer la table si elle n'existe pas
         $conn->exec("
             CREATE TABLE settings (
                 setting_key VARCHAR(50) PRIMARY KEY,
@@ -40,22 +35,18 @@ try {
             )
         ");
 
-        // Insérer les paramètres par défaut
         foreach ($site_settings as $key => $value) {
             $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)");
             $stmt->execute([$key, $value]);
         }
     } else {
-        // Charger les paramètres existants
         $stmt = $conn->query("SELECT setting_key, setting_value FROM settings");
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $site_settings[$row['setting_key']] = $row['setting_value'];
         }
     }
 
-    // Traitement du formulaire
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
-        // Récupérer les valeurs du formulaire
         $site_settings['site_name'] = trim($_POST['site_name']);
         $site_settings['admin_email'] = trim($_POST['admin_email']);
         $site_settings['max_links_per_user'] = intval($_POST['max_links_per_user']);
@@ -64,13 +55,11 @@ try {
         $site_settings['allow_guest_links'] = isset($_POST['allow_guest_links']) ? 1 : 0;
         $site_settings['maintenance_mode'] = isset($_POST['maintenance_mode']) ? 1 : 0;
 
-        // Validation des données
         if (empty($site_settings['site_name'])) {
             $error = "Le nom du site est requis.";
         } elseif (!empty($site_settings['admin_email']) && !filter_var($site_settings['admin_email'], FILTER_VALIDATE_EMAIL)) {
             $error = "L'adresse email d'administration est invalide.";
         } else {
-            // Mettre à jour les paramètres
             foreach ($site_settings as $key => $value) {
                 $stmt = $conn->prepare("
                     INSERT INTO settings (setting_key, setting_value) 

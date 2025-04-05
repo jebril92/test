@@ -140,7 +140,6 @@ function send_verification_email($to_email, $username, $verification_code) {
         </body>
         </html>';
 
-        // if the user have not the html enabled
         $mail->AltBody = "Bonjour $username,\n\n"
             . "Merci de vous être inscrit sur URLink. Pour finaliser votre inscription, veuillez utiliser le code de vérification ci-dessous :\n\n"
             . "$verification_code\n\n"

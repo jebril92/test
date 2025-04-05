@@ -3,13 +3,11 @@ session_start();
 require_once 'config/db-config.php';
 require_once 'includes/maintenance-check.php';
 
-// Si l'utilisateur est un administrateur, rediriger vers la page d'accueil
 if (is_admin()) {
     header("Location: index.php");
     exit();
 }
 
-// Si le site n'est pas en maintenance, rediriger vers la page d'accueil
 if (!is_maintenance_mode()) {
     header("Location: index.php");
     exit();
