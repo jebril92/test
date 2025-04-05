@@ -505,8 +505,8 @@ $user_role = get_user_role();
         <div class="col-lg-4 col-md-6">
           <h5 class="mb-4">Contact et support</h5>
           <div class="footer-links">
-            <a href="#">Centre d'aide</a>
-            <a href="#">Contact</a>
+            <a href="help-center.php">Centre d'aide</a>
+            <a href="contact.php">Contact</a>
             <a href="#">Conditions d'utilisation</a>
             <a href="#">Politique de confidentialité</a>
           </div>

@@ -151,6 +151,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 </head>
 
 <body>
+    <a href="index.php" class="back-to-site">
+        <i class="fas fa-arrow-left"></i> Retour au site
+    </a>
 
 <?php if (isset($maintenance_message)): ?>
     <div class="maintenance-alert">

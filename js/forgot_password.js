@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('needHelp').addEventListener('click', function() {
-        alert('Un conseiller va vous contacter prochainement pour vous aider à récupérer votre compte.');
+        window.location.href = '../contact.php';
     });
 
     const resetForm = document.getElementById('resetPasswordForm');

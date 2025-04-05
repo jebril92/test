@@ -383,3 +383,29 @@ body {
 body:has(.maintenance-alert) .container {
     margin-top: 50px;
 }
+
+.back-to-site {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.back-to-site:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, A0.2);
+    color: white;
+}
+
+.back-to-site i {
+    margin-right: 5px;
+}
