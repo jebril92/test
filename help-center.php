@@ -372,8 +372,8 @@ $show_all = empty($category_filter) && empty($search_term);
                     <div class="footer-links">
                         <a href="help-center.php">Centre d'aide</a>
                         <a href="contact.php">Contact</a>
-                        <a href="#">Conditions d'utilisation</a>
-                        <a href="#">Politique de confidentialité</a>
+                        <a href="terms.php">Conditions d'utilisation</a>
+                        <a href="privacy.php">Politique de confidentialité</a>
                     </div>
                 </div>
             </div>
