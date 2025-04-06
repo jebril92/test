@@ -8,6 +8,47 @@ if (!is_logged_in()) {
     exit();
 }
 
+$error_message = "";
+$success_message = "";
+
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'empty_fields':
+            $error_message = "Veuillez remplir tous les champs.";
+            break;
+        case 'password_mismatch':
+            $error_message = "Les nouveaux mots de passe ne correspondent pas.";
+            break;
+        case 'password_too_short':
+            $error_message = "Le mot de passe doit contenir au moins 8 caractères.";
+            break;
+        case 'password_complexity':
+            $error_message = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.";
+            break;
+        case 'incorrect_current_password':
+            $error_message = "Le mot de passe actuel est incorrect.";
+            break;
+        case 'database_error':
+            $error_message = "Une erreur de base de données s'est produite. Veuillez réessayer plus tard.";
+            break;
+        case 'delete_account_error':
+            $error_message = "Une erreur s'est produite lors de la suppression du compte. Veuillez réessayer.";
+            break;
+        default:
+            $error_message = "Une erreur s'est produite. Veuillez réessayer.";
+    }
+}
+
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'password_updated':
+            $success_message = "Votre mot de passe a été mis à jour avec succès.";
+            break;
+        default:
+            $success_message = "Opération réussie.";
+    }
+}
+
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -21,7 +62,7 @@ try {
     $user_links = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    die("Erreur de base de données : " . $e->getMessage());
+    $error_message = "Erreur de base de données : " . $e->getMessage();
 }
 ?>
 
@@ -30,7 +71,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - URLink</title>
+    <title>Mon Profil - URLink</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -56,7 +97,7 @@ try {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.php">Tableau de bord</a>
+                        <a class="nav-link" href="dashboard.php">Tableau de bord</a>
                     </li>
                     <?php if ($_SESSION['is_admin'] == 1): ?>
                     <li class="nav-item">
@@ -70,7 +111,7 @@ try {
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="dashboard.php">Tableau de bord</a></li>
-                                <li><a class="dropdown-item" href="profile.php">Mon profil</a></li>
+                                <li><a class="dropdown-item active" href="profile.php">Mon profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="login.php?logout=true">Déconnexion</a></li>
                             </ul>
@@ -94,6 +135,20 @@ try {
         </div>
     </div>
 
+    <?php if (!empty($error_message)): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <?php echo $error_message; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($success_message)): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <?php echo $success_message; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <?php if (!$user): ?>
         <div class="alert alert-danger">Impossible de récupérer vos infos</div>
     <?php else: ?>
@@ -102,7 +157,7 @@ try {
                 <h5 class="mb-0">Infos personnelles</h5>
             </div>
             <div class="card-body">
-                <p><strong>Nom d’utilisateur :</strong> <?= htmlspecialchars($user['username']); ?></p>
+                <p><strong>Nom d'utilisateur :</strong> <?= htmlspecialchars($user['username']); ?></p>
                 <p><strong>Email :</strong> <?= htmlspecialchars($user['email']); ?></p>
                 <p><strong>Membre depuis :</strong> <?= date('d/m/Y', strtotime($user['created_at'])); ?></p>
             </div>
@@ -121,6 +176,7 @@ try {
                     <div class="mb-3">
                         <label class="form-label">Nouveau mot de passe</label>
                         <input type="password" name="new_password" class="form-control" required>
+                        <div class="form-text">Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial.</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Confirmer le nouveau mot de passe</label>
@@ -131,43 +187,49 @@ try {
             </div>
         </div>
 
-        
-
         <?php if (!empty($user_links)): ?>
             <h2 class="mt-4">Mes liens raccourcis</h2>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Original</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($user_links as $link): ?>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td><?= htmlspecialchars($link['short_code']); ?></td>
-                            <td>
-                                <a href="<?= htmlspecialchars($link['original_url']); ?>" target="_blank">
-                                    <?= strlen($link['original_url']) > 40 ? substr($link['original_url'], 0, 40) . '...' : $link['original_url']; ?>
-                                </a>
-                            </td>
-                            <td><?= date('d/m/Y H:i', strtotime($link['created_at'])); ?></td>
-                            <td>
-                                <a href="edit_link.php?id=<?= $link['id']; ?>" class="btn btn-sm btn-warning me-1">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="delete_url.php?id=<?= $link['id']; ?>&code=<?= $link['short_code']; ?>" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </td>
+                            <th>Code</th>
+                            <th>Original</th>
+                            <th>Date</th>
+                            <th>Actions</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($user_links as $link): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($link['short_code']); ?></td>
+                                <td>
+                                    <a href="<?= htmlspecialchars($link['original_url']); ?>" target="_blank">
+                                        <?= strlen($link['original_url']) > 40 ? substr($link['original_url'], 0, 40) . '...' : $link['original_url']; ?>
+                                    </a>
+                                </td>
+                                <td><?= date('d/m/Y H:i', strtotime($link['created_at'])); ?></td>
+                                <td>
+                                    <a href="edit_link.php?id=<?= $link['id']; ?>" class="btn btn-sm btn-warning me-1" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="stats.php?id=<?= $link['id']; ?>" class="btn btn-sm btn-info me-1" title="Statistiques">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
+                                    <a href="delete_url.php?id=<?= $link['id']; ?>&code=<?= $link['short_code']; ?>" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce lien ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
-            <p class="text-muted">Vous n'avez encore raccourci aucun lien.</p>
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle me-2"></i> Vous n'avez encore raccourci aucun lien.
+                <a href="dashboard.php" class="alert-link">Cliquez ici</a> pour créer votre premier lien raccourci.
+            </div>
         <?php endif; ?>
 
         <div class="card mb-5 shadow-sm border-danger">
@@ -175,9 +237,13 @@ try {
                 <h5 class="mb-0 text-danger">Supprimer mon compte</h5>
             </div>
             <div class="card-body">
-                <p class="text-danger">Cette action est irréversible. Tous vos liens seront supprimés.</p>
-                <form method="POST" action="actions/delete_account.php" onsubmit="return confirm('Etes-vous sûr de vouloir supprimer votre compte ?');">
-                    <button type="submit" class="btn btn-outline-danger">Supprimer mon compte</button>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Attention ! Cette action est irréversible. Tous vos liens raccourcis et les statistiques associées seront définitivement supprimés.
+                </div>
+                <form method="POST" action="actions/delete_account.php" onsubmit="return confirm('Êtes-vous vraiment sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront perdues.');">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer définitivement mon compte
+                    </button>
                 </form>
             </div>
         </div>
@@ -186,5 +252,36 @@ try {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="js/theme-switcher.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.querySelector('form[action="actions/update_password.php"]');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            const newPassword = this.querySelector('input[name="new_password"]').value;
+            const confirmPassword = this.querySelector('input[name="confirm_password"]').value;
+            
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('Les mots de passe ne correspondent pas.');
+                return false;
+            }
+            
+            const hasUpperCase = /[A-Z]/.test(newPassword);
+            const hasLowerCase = /[a-z]/.test(newPassword);
+            const hasNumbers = /[0-9]/.test(newPassword);
+            const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+            
+            if (newPassword.length < 8 || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecial) {
+                e.preventDefault();
+                alert('Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial.');
+                return false;
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
 </body>
 </html>
