@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = $smtp_port;
             $mail->setFrom($smtp_username, $smtp_from_name);
-            $mail->addAddress($smtp_username); // Envoyer à l'administrateur
+            $mail->addAddress($smtp_username);
             $mail->isHTML(true);
             $mail->Subject = "Contact URLink: " . $subject;
 
@@ -290,7 +290,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                                 
                                 <div class="privacy-notice mb-4">
-                                    <p>En soumettant ce formulaire, vous acceptez notre <a href="#">politique de confidentialité</a>. Nous utilisons vos informations uniquement pour répondre à votre demande.</p>
+                                    <p>En soumettant ce formulaire, vous acceptez notre <a href="privacy.php">politique de confidentialité</a>. Nous utilisons vos informations uniquement pour répondre à votre demande.</p>
                                 </div>
                                 
                                 <div class="text-center">
