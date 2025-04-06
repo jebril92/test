@@ -60,6 +60,11 @@
                             <li><a class="dropdown-item" href="../login.php?logout=true"><i class="fas fa-sign-out-alt me-1"></i> Déconnexion</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item ms-2">
+                        <button id="theme-toggle" class="btn btn-link nav-link theme-toggle-icon" aria-label="Changer de thème">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -388,7 +388,7 @@ $user_role = get_user_role();
         <div class="col-lg-4 col-md-6">
           <div class="testimonial-card">
             <div class="testimonial-text">
-              "En tant que freelance, je gère de nombreux liens pour différents clients. URLink simplifie mon travail quotidien et me permet de paraître plus professionnel."
+              "En tant que freelance, je gère de nombreux liens pour différents clients. URLink simplifie mon travail quotidien."
             </div>
             <div class="testimonial-author">
               <div class="testimonial-avatar">
@@ -416,11 +416,11 @@ $user_role = get_user_role();
           <div class="accordion" id="faqAccordion">
             <div class="accordion-item">
               <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                   Combien de temps mes liens raccourcis restent-ils actifs ?
                 </button>
               </h2>
-              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+              <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
                   Avec notre plan gratuit, vos liens restent actifs à vie. De plus, avec l'abonnement Entreprise, vous bénéficiez d'un support dédié pour répondre à toutes vos questions et besoins spécifiques.
                 </div>

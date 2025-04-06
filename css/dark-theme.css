@@ -1,19 +1,21 @@
 :root.dark-theme {
-    --primary-color: #6d8dff;
-    --primary-color-rgb: 109, 141, 255;
-    --secondary-color: #5a42d3;
-    --accent-color: #59d4ff;
+    --primary-color: #82a4ff;
+    --primary-color-rgb: 130, 164, 255;
+    --secondary-color: #8c6ff7;
+    --accent-color: #6fe9ff;
+    
     --light-color: #292a2d;
-    --dark-color: #f8f9fa;
-    --bg-color: #202124;
-    --text-color: #e8eaed;
-    --card-bg: #2d2e32;
+    --dark-color: #121214;
+    --bg-color: #121214;
+    --text-color: #ffffff;
+    --muted-text: #b4b8bc;
+    
+    --card-bg: #1e1f23;
     --border-color: #414244;
-    --input-bg: #3c3c3f;
-    --input-text: #e8eaed;
-    --table-header-bg: #1e1e20;
-    --table-stripe-bg: #2b2c30;
-    --muted-text: #9aa0a6;
+    --input-bg: #2c2c30;
+    --input-text: #ffffff;
+    --table-header-bg: #18181a;
+    --table-stripe-bg: #24252a;
 }
 
 :root {
@@ -40,12 +42,12 @@
 }
 
 .dark-theme .navbar.navbar-dark {
-    background-color: #1a1a1d !important;
+    background-color: #141417 !important;
     border-bottom: 1px solid var(--border-color);
 }
 
 .dark-theme .navbar.navbar-scrolled {
-    background-color: rgba(26, 26, 29, 0.98) !important;
+    background-color: rgba(20, 20, 23, 0.98) !important;
     backdrop-filter: blur(10px);
 }
 
@@ -57,11 +59,13 @@
 .dark-theme .card {
     background-color: var(--card-bg);
     border-color: var(--border-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dark-theme .card-header {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.3);
     border-bottom-color: var(--border-color);
+    color: var(--text-color);
 }
 
 .dark-theme .modal-content {
@@ -103,6 +107,7 @@
     background-color: var(--input-bg);
     color: var(--input-text);
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
 }
 
 .dark-theme .input-group-text {
@@ -120,11 +125,13 @@
 }
 
 .dark-theme .table-hover tbody tr:hover {
-    background-color: rgba(var(--primary-color-rgb), 0.1);
+    background-color: rgba(var(--primary-color-rgb), 0.15);
 }
 
 .dark-theme .table th {
     background-color: var(--table-header-bg);
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .dark-theme .table td, 
@@ -135,11 +142,12 @@
 .dark-theme .btn-outline-primary {
     color: var(--primary-color);
     border-color: var(--primary-color);
+    font-weight: 500;
 }
 
 .dark-theme .btn-outline-primary:hover {
     background-color: var(--primary-color);
-    color: var(--dark-color);
+    color: #121214;
 }
 
 .dark-theme .btn-outline-secondary {
@@ -149,22 +157,24 @@
 
 .dark-theme a {
     color: var(--primary-color);
+    text-decoration: none;
 }
 
 .dark-theme a:hover {
     color: var(--accent-color);
+    text-decoration: underline;
 }
 
 .dark-theme footer {
-    background-color: #1a1a1d;
+    background-color: #141417;
 }
 
 .dark-theme .hero-section {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: linear-gradient(135deg, #374899, #603cb5);
 }
 
 .dark-theme .cta-section {
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    background: linear-gradient(135deg, #603cb5, #374899);
 }
 
 .dark-theme .stats-section,
@@ -176,7 +186,8 @@
 .dark-theme .pricing-card {
     background-color: var(--card-bg);
     color: var(--text-color);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
 }
 
 .dark-theme .pricing-header {
@@ -185,6 +196,7 @@
 
 .dark-theme .pricing-price {
     color: var(--primary-color);
+    font-weight: bold;
 }
 
 .dark-theme .pricing-period {
@@ -202,7 +214,7 @@
 .dark-theme .testimonial-card {
     background-color: var(--card-bg);
     color: var(--text-color);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .dark-theme .testimonial-text {
@@ -225,7 +237,8 @@
 
 .dark-theme .accordion-button:not(.collapsed) {
     background-color: var(--primary-color);
-    color: white;
+    color: #0a0a0c;
+    font-weight: 500;
 }
 
 .dark-theme .accordion-body {
@@ -246,10 +259,12 @@
 .dark-theme .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+    color: #121214; /* Texte foncé sur fond clair */
 }
 
 .dark-theme .badge {
     background-color: var(--primary-color);
+    color: #121214;
 }
 
 body {
@@ -280,8 +295,9 @@ body {
 }
 
 .dark-theme .dropdown-menu {
-    background-color: var(--card-bg);
+    background-color: #1a1a1f;
     border-color: var(--border-color);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 .dark-theme .dropdown-item {
@@ -290,10 +306,397 @@ body {
 
 .dark-theme .dropdown-item:hover,
 .dark-theme .dropdown-item:focus {
-    background-color: rgba(var(--primary-color-rgb), 0.1);
+    background-color: rgba(var(--primary-color-rgb), 0.15);
     color: var(--primary-color);
 }
 
 .dark-theme .dropdown-divider {
     border-top-color: var(--border-color);
+}
+
+.dark-theme .btn-primary.btn-login {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.dark-theme .btn-primary.btn-login:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: #ffffff;
+}
+
+.dark-theme .dropdown-toggle::after {
+    color: #ffffff;
+}
+
+.dark-theme .btn-danger.btn-login {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
+}
+
+.dark-theme .btn-danger.btn-login:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    color: #ffffff;
+}
+
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark-theme .form-label {
+    color: var(--text-color);
+}
+
+.dark-theme .form-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark-theme select option {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.dark-theme .card-header.bg-light {
+    background-color: var(--light-color) !important;
+    color: var(--text-color);
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.dark-theme .category-card h3 {
+    color: var(--text-color);
+}
+
+.dark-theme .category-card .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-theme .category-card .text-muted {
+    color: var(--muted-text) !important;
+}
+
+.dark-theme .category-card:hover .card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+}
+
+.dark-theme .category-card .card {
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .table-links thead {
+    background-color: var(--table-header-bg) !important;
+}
+
+.dark-theme .table-links th {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Correction pour les cellules du tableau */
+.dark-theme .table-links td {
+    color: var(--text-color);
+    border-color: var(--border-color);
+    background-color: var(--card-bg);
+}
+
+/* Correction pour les liens dans le tableau */
+.dark-theme .table-links a {
+    color: var(--primary-color);
+}
+
+/* Correction pour les badges statut */
+.dark-theme .badge.bg-success.bg-opacity-10 {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+}
+
+.dark-theme .badge.bg-danger.bg-opacity-10 {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Correction pour les boutons d'action */
+.dark-theme .btn-icon {
+    color: var(--text-color);
+}
+
+/* Correction pour l'arrière-plan de la pagination */
+.dark-theme .pagination {
+    background-color: var(--card-bg);
+}
+
+.dark-theme .page-item:not(.active) .page-link {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Amélioration pour la section "User Welcome" */
+.dark-theme .user-welcome {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* Correction pour les stats cards */
+.dark-theme .stats-card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Correction pour la pagination active */
+.dark-theme .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Correction pour les lignes alternées du tableau */
+.dark-theme .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--table-stripe-bg);
+    color: var(--text-color);
+}
+
+/* Correction pour le survol des lignes du tableau */
+.dark-theme .table-hover > tbody > tr:hover > * {
+    background-color: rgba(var(--primary-color-rgb), 0.15);
+    color: var(--text-color);
+}
+
+/* Correction pour les boutons dans le tableau */
+.dark-theme .table .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.dark-theme .table .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.dark-theme .table .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Correction pour le fond du corps du tableau */
+.dark-theme .table > :not(caption) > * > * {
+    background-color: var(--card-bg);
+}
+
+/* Correction pour le texte "Jamais" dans le tableau */
+.dark-theme .text-muted {
+    color: var(--muted-text) !important;
+}
+
+/* Ajoutez ce code à votre fichier css/dark-theme.css */
+
+/* Correction pour le titre "Mes liens raccourcis" */
+.dark-theme .card-header h5.mb-0 {
+    color: var(--text-color);
+}
+
+/* Correction pour le sélecteur d'entrées "Afficher" */
+.dark-theme .dataTables_length label,
+.dark-theme .dataTables_filter label {
+    color: var(--text-color);
+}
+
+/* Correction pour le texte "entrées" */
+.dark-theme .dataTables_length,
+.dark-theme .dataTables_filter {
+    color: var(--text-color);
+}
+
+/* Correction pour le texte "Rechercher :" */
+.dark-theme .dataTables_filter label {
+    color: var(--text-color);
+}
+
+/* Correction pour le texte d'information de pagination */
+.dark-theme .dataTables_info {
+    color: var(--text-color);
+}
+
+/* Correction pour les boutons de pagination précédent/suivant */
+.dark-theme .dataTables_paginate .paginate_button {
+    color: var(--text-color) !important;
+}
+
+.dark-theme .dataTables_paginate .paginate_button.current {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+}
+
+.dark-theme .dataTables_paginate .paginate_button:hover {
+    background: rgba(var(--primary-color-rgb), 0.2) !important;
+    color: var(--text-color) !important;
+    border-color: rgba(var(--primary-color-rgb), 0.2) !important;
+}
+
+/* Correction pour le sélecteur d'entrées */
+.dark-theme .dataTables_length select {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Correction pour le champ de recherche */
+.dark-theme .dataTables_filter input {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Correction du texte des boutons de pagination */
+.dark-theme .paginate_button.page-item a.page-link {
+    color: var(--text-color);
+}
+
+/* Amélioration du contraste des boutons de pagination */
+.dark-theme .btn-sm.btn-outline-primary.mx-1 {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.dark-theme .btn-sm.btn-outline-primary.mx-1:hover {
+    background-color: rgba(var(--primary-color-rgb), 0.2);
+    color: var(--text-color);
+}
+
+/* Correction pour les en-têtes de colonne du tableau */
+.dark-theme .table th.border-0 {
+    color: var(--text-color);
+}
+
+.dark-theme .card-header h5,
+.dark-theme .card-header .h5,
+.dark-theme .card-header .card-title,
+.dark-theme .card .card-header .mb-0 {
+    color: var(--dark-color) !important; /* Force l'application de la couleur sombre */
+}
+
+/* En cas d'utilisation du thème lumière dans un conteneur dark-theme */
+.dark-theme .card-header.bg-white h5 {
+    color: var(--dark-color) !important;
+}
+
+/* Ciblage encore plus spécifique si nécessaire */
+.dark-theme .card .card-header h5.mb-0,
+.dark-theme .card-header > h5.mb-0 {
+    color: var(--dark-color) !important;
+}
+
+.dark-theme .sidebar {
+    background-color: #1a1a1f;
+    border-right: 1px solid var(--border-color);
+}
+
+.dark-theme .sidebar .nav-link {
+    color: var(--text-color) !important;
+}
+
+.dark-theme .sidebar .nav-link:hover,
+.dark-theme .sidebar .nav-link.active {
+    background-color: rgba(var(--primary-color-rgb), 0.15);
+    color: var(--primary-color) !important;
+}
+
+.dark-theme .sidebar .nav-link i {
+    color: var(--primary-color);
+}
+
+.dark-theme .sidebar-heading {
+    color: var(--muted-text);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Correction pour les titres et texte dans le panneau admin */
+.dark-theme .content-wrapper h1,
+.dark-theme .content-wrapper .h1,
+.dark-theme .content-wrapper h2, 
+.dark-theme .content-wrapper .text-muted {
+    color: var(--text-color) !important;
+}
+
+/* Correction pour les boutons "Voir tous les utilisateurs/liens" */
+.dark-theme .btn-outline-primary.btn-sm {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.dark-theme .btn-outline-primary.btn-sm:hover {
+    background-color: var(--primary-color);
+    color: #0a0a0c;
+}
+
+/* Correction pour la barre de navigation du tableau de bord admin */
+.dark-theme #mainNav.navbar-dark {
+    background-color: #141417 !important;
+}
+
+/* S'assurer que l'icône de thème est disponible dans la navbar admin et dashboard */
+.dark-theme .navbar-nav .theme-toggle-icon {
+    display: block !important;
+}
+
+.dark-theme .col-md-3.col-lg-2.d-md-block.bg-light.sidebar,
+.dark-theme .bg-light.sidebar,
+.dark-theme div[class*="sidebar"],
+.dark-theme .sidebar.collapse {
+    background-color: #1a1a1f !important;
+    color: var(--text-color) !important;
+}
+
+/* Target specifiquement les icones et textes dans la sidebar */
+.dark-theme .sidebar .nav-item a,
+.dark-theme .sidebar .nav-link,
+.dark-theme .sidebar .nav a,
+.dark-theme .sidebar a.nav-link {
+    color: var(--text-color) !important;
+}
+
+/* Sélecteur encore plus fort pour les éléments de navigation */
+.dark-theme .sidebar.bg-light * {
+    color: var(--text-color) !important;
+}
+
+/* Forcer le background de tous les éléments de la sidebar */
+.dark-theme .sidebar *, 
+.dark-theme .sidebar .position-sticky,
+.dark-theme .sidebar .nav,
+.dark-theme .sidebar .nav-item {
+    background-color: #1a1a1f !important;
+}
+
+/* Traiter spécifiquement les icônes de la sidebar */
+.dark-theme .sidebar .fas,
+.dark-theme .sidebar i[class*="fa-"] {
+    color: var(--primary-color) !important;
+}
+
+/* Override pour la classe .bg-light spécifiquement dans la sidebar */
+.dark-theme .bg-light.sidebar,
+.dark-theme .sidebar.bg-light,
+.dark-theme div.sidebar.bg-light {
+    background-color: #1a1a1f !important;
+}
+
+/* Traiter le cas où la sidebar pourrait avoir une classe dynamique */
+.dark-theme [class*="sidebar"] {
+    background-color: #1a1a1f !important;
+}
+
+/* Force l'application du thème sombre sur la classe bg-light partout dans l'admin */
+.dark-theme .bg-light {
+    background-color: var(--card-bg) !important;
 }
